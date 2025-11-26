@@ -1,5 +1,5 @@
 package com.campusorg.services;
 
-public class MemberService {
+public class FinanceService {
    
 }
