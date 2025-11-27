@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.manager.controller.LoginController"
+            prefWidth="900" prefHeight="600"
+            style="-fx-background-color: #000000;">
+
+    <!-- Container yang di-center -->
+    <VBox alignment="CENTER"
+          spacing="20"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0">
+
+        <!-- Title -->
+        <Label text="Polban DataHub"
+               style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+
+        <Label text="Sistem Integrasi Data Organisasi Mahasiswa"
+               style="-fx-text-fill: #d0d0d0; -fx-font-size: 14px;"/>
+
+        <Label text="Masuk ke Akun Anda"
+               style="-fx-text-fill: #cccccc; -fx-font-size: 13px; -fx-padding: 10 0 0 0;"/>
+
+        <!-- Username -->
+        <TextField fx:id="usernameField"
+                   promptText="Username"
+                   style="-fx-background-radius: 6; -fx-padding: 10; -fx-pref-width: 300;">
+        </TextField>
+
+        <!-- Password -->
+        <PasswordField fx:id="passwordField"
+                       promptText="Password"
+                       style="-fx-background-radius: 6; -fx-padding: 10; -fx-pref-width: 300;">
+        </PasswordField>
+
+        <!-- Login Button -->
+        <Button text="Login"
+                onAction="#handleLogin"
+                style="
+                    -fx-background-color: white;
+                    -fx-text-fill: black;
+                    -fx-background-radius: 6;
+                    -fx-padding: 8 40;
+                    -fx-font-size: 14px;
+                "/>
+    </VBox>
+
+</AnchorPane>

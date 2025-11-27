@@ -1,0 +1,71 @@
+/* BACKGROUND */
+.bg {
+    -fx-fill: linear-gradient(to bottom right, #1B2376, #10174A);
+}
+
+/* TITLE */
+.app-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.subtitle {
+    -fx-text-fill: #F6983E;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* FORM CARD */
+.form-box {
+    -fx-padding: 35 45;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 15;
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 20, 0, 0, 5);
+}
+
+.login-title {
+    -fx-text-fill: white;
+    -fx-font-size: 19px;
+    -fx-font-weight: 600;
+}
+
+/* INPUT FIELDS */
+.input-field {
+    -fx-padding: 10;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #F6983E;
+    -fx-background-color: rgba(255,255,255,0.85);
+    -fx-font-size: 14px;
+}
+
+/* LOGIN BUTTON */
+.login-btn {
+    -fx-background-color: #F6983E;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-background-radius: 10;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.login-btn:hover {
+    -fx-background-color: #ffb06b;
+    -fx-cursor: hand;
+}
+
+/* ERROR LABEL */
+.error-label {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+}
+
+/* FOOTER */
+.footer {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}

@@ -1,0 +1,63 @@
+/* NAVBAR */
+.navbar {
+    -fx-background-color: white;
+    -fx-padding: 15 25;
+}
+
+.dark .navbar {
+    -fx-background-color: #1B2376;
+}
+
+.app-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* SIDEBAR */
+.sidebar {
+    -fx-background-color: #1B2376;
+    -fx-pref-width: 190;
+    -fx-text-fill: white;
+}
+
+.sidebar Label {
+    -fx-text-fill: white;
+}
+
+/* MAIN */
+.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.welcome-box {
+    -fx-background-color: #F6983E22;
+    -fx-background-radius: 10;
+}
+
+/* FOOTER */
+.footer {
+    -fx-background-color: #1B2376;
+}
+
+.footer-title {
+    -fx-text-fill: #F6983E;
+    -fx-font-weight: bold;
+}
+
+.footer-text {
+    -fx-text-fill: white;
+}
+
+/* DARK MODE ROOT */
+.dark {
+    -fx-background-color: #121212;
+}
+
+.dark .title {
+    -fx-text-fill: white;
+}
+
+.dark .footer {
+    -fx-background-color: #0D0D0D;
+}

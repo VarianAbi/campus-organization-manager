@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane fx:id="rootPane"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.manager.controller.DashboardController"
+            stylesheets="@../../style/dashboard.css">
+
+    <!-- TOP NAVBAR -->
+    <top>
+        <HBox fx:id="navbar" spacing="20" alignment="CENTER_LEFT" styleClass="navbar">
+
+            <HBox alignment="CENTER_LEFT" spacing="10" HBox.hgrow="ALWAYS">
+                <ImageView fx:id="logoApp" fitHeight="28" fitWidth="28"/>
+                <Label text="Polban DataHub" styleClass="app-title"/>
+            </HBox>
+
+            <HBox alignment="CENTER_RIGHT" spacing="15">
+                <padding>
+                    <Insets top="0" right="20" bottom="0" left="0"/>
+                </padding>
+
+                <Button fx:id="themeBtn" styleClass="icon-btn"/>
+                <MenuButton fx:id="userMenu" text="Admin" styleClass="user-btn">
+                    <MenuItem text="Logout" fx:id="logoutBtn"/>
+                </MenuButton>
+            </HBox>
+
+        </HBox>
+    </top>
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox fx:id="sidebar" spacing="15" styleClass="sidebar">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Review Data"/>
+            <Label text="Activity Logs"/>
+            <Label text="Download Data"/>
+            <Label text="FAQ"/>
+        </VBox>
+    </left>
+
+    <!-- CONTENT -->
+    <center>
+        <VBox spacing="20" alignment="TOP_LEFT">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <Label text="Selamat  Datang, Admin!" styleClass="title"/>
+            <Pane prefHeight="240" styleClass="welcome-box"/>
+        </VBox>
+    </center>
+
+    <!-- FOOTER -->
+    <bottom>
+        <VBox styleClass="footer" spacing="5">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <HBox spacing="40">
+
+                <VBox spacing="5">
+                    <Label text="Polban DataHub" styleClass="footer-title"/>
+                    <Label text="Sistem Portal Integrasi Data Organisasi Mahasiswa Politeknik Negeri Bandung." styleClass="footer-text"/>
+                    <Label text="Dibuat untuk keperluan integrasi, administrasi, dan visualisasi data kampus." styleClass="footer-text"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Menu Cepat" styleClass="footer-title"/>
+                    <Label text="Admin" styleClass="footer-text"/>
+                    <Label text="Peserta" styleClass="footer-text"/>
+                    <Label text="Partisipasi" styleClass="footer-text"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Hubungi Kami" styleClass="footer-title"/>
+                    <Label text="Jl. Gegerkalong Hilir, Ciwaruga, Kec. Parongpong," styleClass="footer-text"/>
+                    <Label text="Kab. Bandung Barat, Jawa Barat 40559" styleClass="footer-text"/>
+                    <Label text="Telp: +62 - 22 - 2013789 | Fax: +62 - 22 - 2013889" styleClass="footer-text"/>
+                    <Label text="admin-datahub@polban.ac.id" styleClass="footer-text"/>
+                </VBox>
+
+            </HBox>
+
+            <Label text="© 2025 Polban DataHub. Sistem Informasi Terintegrasi."
+                   style="-fx-font-size: 11px;"/>
+
+        </VBox>
+    </bottom>
+
+</BorderPane>
