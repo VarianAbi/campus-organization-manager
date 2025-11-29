@@ -1,5 +1,0 @@
-package com.campusorg.services;
-
-public class MemberService {
-   
-}

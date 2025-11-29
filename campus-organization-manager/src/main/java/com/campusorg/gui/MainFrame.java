@@ -4,16 +4,19 @@ import com.campusorg.models.*;
 import com.campusorg.patterns.MemberFactory;
 import com.campusorg.services.OrgManager;
 
+// --- IMPORT YANG BENAR (HANYA SWING & AWT) ---
+// JANGAN ADA JAVAFX DISINI
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
+import java.awt.*; // Ini meng-cover Color, Font, Cursor, Image
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URL;
 
 public class MainFrame extends JFrame {
 
@@ -34,16 +37,18 @@ public class MainFrame extends JFrame {
     private DefaultTableModel detailModel;
 
     // --- HALAMAN 3: ALL MEMBERS ---
+    private JPanel allMembersPanel;
     private JTable allTable;
     private DefaultTableModel allModel;
     private JTextField searchField;
     private JComboBox<String> filterDivCombo;
     private TableRowSorter<DefaultTableModel> rowSorter;
 
-    // --- HALAMAN 4: INPUT (Updated) ---
+    // --- HALAMAN 4: INPUT ---
+    private JPanel inputPanel;
     private JTextField inpName;
     private JComboBox<String> inpDiv;
-    private JComboBox<String> inpRole; // Isinya dinamis
+    private JComboBox<String> inpRole; 
     
     // --- CONSTANT ROLES ---
     private final String[] ROLES_BPH = {
@@ -87,6 +92,7 @@ public class MainFrame extends JFrame {
         initAllMembersPanel();  
         initInputPanel();       
 
+        // Menambahkan panel ke CardLayout
         contentPanel.add(homePanel, "HOME");
         contentPanel.add(detailDivPanel, "DETAIL");
         contentPanel.add(allMembersPanel, "ALL");
@@ -106,14 +112,34 @@ public class MainFrame extends JFrame {
         sidebarPanel.setBackground(COL_SIDEBAR);
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
 
-        // Logo Area
-        JPanel logoPnl = new JPanel(new BorderLayout());
+        // --- AREA LOGO & JUDUL ---
+        JPanel logoPnl = new JPanel();
+        logoPnl.setLayout(new BoxLayout(logoPnl, BoxLayout.Y_AXIS));
         logoPnl.setBackground(COL_SIDEBAR);
-        logoPnl.setBorder(new EmptyBorder(30, 20, 30, 20));
-        JLabel title = new JLabel("HIMAKOM APP", SwingConstants.CENTER);
+        logoPnl.setBorder(new EmptyBorder(30, 10, 20, 10));
+
+        // 1. Komponen Gambar Logo
+        JLabel imageLabel = new JLabel();
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT); 
+
+        // Load logo
+        ImageIcon logoIcon = loadIcon("logo_himakom.png", 80, 80);
+        if (logoIcon != null) {
+            imageLabel.setIcon(logoIcon);
+        } else {
+            imageLabel.setText("<html><h2 style='color:white;'>[LOGO]</h2></html>");
+        }
+
+        // 2. Komponen Teks Judul
+        JLabel title = new JLabel("HIMAKOM APP");
         title.setForeground(Color.WHITE);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20)); 
+        title.setAlignmentX(Component.CENTER_ALIGNMENT); 
+
+        logoPnl.add(imageLabel);
+        logoPnl.add(Box.createVerticalStrut(15)); 
         logoPnl.add(title);
+        
         sidebarPanel.add(logoPnl);
 
         // Menu Buttons
@@ -167,18 +193,14 @@ public class MainFrame extends JFrame {
         mainScrollContent.setBackground(COL_BG);
         mainScrollContent.setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        JLabel lblLead = new JLabel("Pimpinan Teras (BPH Inti)");
+        JLabel lblLead = new JLabel("STRUKTUR ORGANISASI HIMAKOM");
         lblLead.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblLead.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         leadersContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         leadersContainer.setBackground(COL_BG);
         leadersContainer.setMaximumSize(new Dimension(2000, 120));
-
-        JLabel lblDiv = new JLabel("Daftar Departemen & Biro");
-        lblDiv.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblDiv.setAlignmentX(Component.LEFT_ALIGNMENT);
-
+        
         divisionsGrid = new JPanel(new GridLayout(0, 3, 15, 15)); 
         divisionsGrid.setBackground(COL_BG);
 
@@ -187,7 +209,6 @@ public class MainFrame extends JFrame {
         mainScrollContent.add(Box.createVerticalStrut(20));
         mainScrollContent.add(new JSeparator());
         mainScrollContent.add(Box.createVerticalStrut(20));
-        mainScrollContent.add(lblDiv);
         mainScrollContent.add(Box.createVerticalStrut(15));
         mainScrollContent.add(divisionsGrid);
 
@@ -233,7 +254,6 @@ public class MainFrame extends JFrame {
     }
 
     // ================== UI: ALL MEMBERS PAGE ==================
-    private JPanel allMembersPanel;
     private void initAllMembersPanel() {
         allMembersPanel = new JPanel(new BorderLayout(10, 10));
         allMembersPanel.setBackground(COL_BG);
@@ -289,8 +309,7 @@ public class MainFrame extends JFrame {
         allMembersPanel.add(scroll, BorderLayout.CENTER);
     }
 
-    // ================== UI: INPUT PAGE (UPDATED LOGIC) ==================
-    private JPanel inputPanel;
+    // ================== UI: INPUT PAGE ==================
     private void initInputPanel() {
         inputPanel = new JPanel(new BorderLayout());
         inputPanel.setBackground(COL_BG);
@@ -304,17 +323,10 @@ public class MainFrame extends JFrame {
         ));
         
         inpName = new JTextField();
-        
-        // Dropdown Divisi
         inpDiv = new JComboBox<>(OrgManager.getInstance().getDivisionNames());
-        
-        // Dropdown Role (Kosong dulu, nanti diisi otomatis)
         inpRole = new JComboBox<>();
 
-        // LOGIC DINAMIS: Saat Divisi dipilih, Ubah isi Role
         inpDiv.addActionListener(e -> updateRoleDropdown());
-
-        // Panggil sekali di awal untuk set default state
         updateRoleDropdown();
 
         JButton btnSave = new JButton("SIMPAN ANGGOTA");
@@ -328,7 +340,7 @@ public class MainFrame extends JFrame {
         formCard.add(new JLabel("Divisi / Penempatan"));
         formCard.add(inpDiv);
         formCard.add(new JLabel("Jabatan / Posisi"));
-        formCard.add(inpRole); // Dropdown ini otomatis berubah isi
+        formCard.add(inpRole);
         
         formCard.add(Box.createVerticalStrut(10));
         formCard.add(btnSave);
@@ -337,21 +349,18 @@ public class MainFrame extends JFrame {
         inputPanel.add(formCard, BorderLayout.CENTER);
     }
 
-    // Helper untuk update isi dropdown Role berdasarkan Divisi
     private void updateRoleDropdown() {
         String selectedDiv = (String) inpDiv.getSelectedItem();
-        inpRole.removeAllItems(); // Hapus isi lama
+        inpRole.removeAllItems();
         
         if ("BPH Inti".equals(selectedDiv)) {
-            // Jika BPH, tampilkan jabatan tinggi
             for (String role : ROLES_BPH) inpRole.addItem(role);
         } else {
-            // Jika Divisi lain, tampilkan jabatan standar
             for (String role : ROLES_STD) inpRole.addItem(role);
         }
     }
 
-    // ================== LOGIC: DATA LOADING ==================
+    // ================== LOGIC ==================
 
     private void refreshHomeData() {
         leadersContainer.removeAll();
@@ -403,8 +412,6 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // ================== LOGIC: ACTIONS ==================
-
     private void openDivisionDetail(String divName) {
         detailTitleLabel.setText(divName);
         detailModel.setRowCount(0);
@@ -439,7 +446,6 @@ public class MainFrame extends JFrame {
         cardLayout.show(contentPanel, "DETAIL");
     }
 
-    // UPDATE LOGIC SAVE: Menyesuaikan dengan Dropdown Baru
     private void actionSave() {
         String nm = inpName.getText();
         String dv = (String) inpDiv.getSelectedItem();
@@ -450,16 +456,13 @@ public class MainFrame extends JFrame {
             return; 
         }
 
-        // Logic Mapping ke Factory
         String typeForFactory;
         String titleForFactory;
 
         if (selectedRole.contains("Staff")) {
-            // Kalau pilih Staff Muda/Ahli -> Tipe=Staff..., Title=Kosong
             typeForFactory = selectedRole;
             titleForFactory = ""; 
         } else {
-            // Kalau pilih Ketua Himpunan, Sekjen, Ketua Dept -> Tipe=Pejabat, Title=PilihanDropdown
             typeForFactory = "Pejabat Struktural";
             titleForFactory = selectedRole; 
         }
@@ -507,17 +510,26 @@ public class MainFrame extends JFrame {
         p.setCursor(new Cursor(Cursor.HAND_CURSOR));
         p.setBorder(BorderFactory.createCompoundBorder(
             new LineBorder(new Color(200, 200, 200), 1),
-            new EmptyBorder(20, 20, 20, 20)
+            new EmptyBorder(15, 15, 15, 15)
         ));
 
         JLabel lbl = new JLabel(divName, SwingConstants.CENTER);
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lbl.setForeground(COL_SIDEBAR);
 
-        JLabel icon = new JLabel("📂", SwingConstants.CENTER);
-        icon.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+        // --- ICON LOGIC ---
+        JLabel iconLabel = new JLabel("", SwingConstants.CENTER);
+        String filename = getIconFilename(divName);
+        ImageIcon icon = loadIcon(filename, 50, 50);
 
-        p.add(icon, BorderLayout.CENTER);
+        if (icon != null) {
+            iconLabel.setIcon(icon);
+        } else {
+            iconLabel.setText("📂");
+            iconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+        }
+
+        p.add(iconLabel, BorderLayout.CENTER);
         p.add(lbl, BorderLayout.SOUTH);
 
         p.addMouseListener(new MouseAdapter() {
@@ -527,5 +539,28 @@ public class MainFrame extends JFrame {
         });
 
         return p;
+    }
+
+    private String getIconFilename(String divName) {
+        return divName.toLowerCase()
+                      .replace(".", "")
+                      .replace(" ", "_") 
+                      + ".png";
+    }
+
+    private ImageIcon loadIcon(String filename, int width, int height) {
+        try {
+            URL imgURL = getClass().getResource("/images/" + filename);
+            if (imgURL != null) {
+                ImageIcon originalIcon = new ImageIcon(imgURL);
+                Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                return new ImageIcon(scaledImage);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

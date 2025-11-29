@@ -50,7 +50,7 @@ public class OrgManager {
             createAndMapDiv("Dept. KOMINFO", departemen);
             createAndMapDiv("Dept. LUHIM", departemen);
             createAndMapDiv("Dept. PSDA", departemen);
-            createAndMapDiv("Dept. TEKNO", departemen);
+            createAndMapDiv("Unit TEKNO", departemen);
 
         // 3. LEGISLATIF (MPA)
         createAndMapDiv("MPA", rootOrg); 
