@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
@@ -53,7 +54,7 @@ public class AllMembersPanel extends JPanel {
         topContainer.setOpaque(false);
 
         JLabel title = new JLabel("Data Seluruh Anggota HIMAKOM");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        title.setFont(new Font("Inria Sans", Font.BOLD, 22));
 
         // Panel Filter
         JPanel filterPnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -61,15 +62,18 @@ public class AllMembersPanel extends JPanel {
         filterPnl.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 
         searchField = new JTextField(15);
+        searchField.setFont(new Font("Poppins", Font.PLAIN, 13));
         List<String> divs = new ArrayList<>();
         divs.add("Semua Divisi");
         for (String s : OrgManager.getInstance().getDivisionNames())
             divs.add(s);
         filterCombo = new JComboBox<>(divs.toArray(new String[0]));
+        filterCombo.setFont(new Font("Poppins", Font.PLAIN, 13));
 
         JButton btnFilter = new JButton("Terapkan Filter");
         btnFilter.setBackground(new Color(52, 152, 219));
         btnFilter.setForeground(Color.WHITE);
+        btnFilter.setFont(new Font("Poppins", Font.BOLD, 12));
         btnFilter.addActionListener(e -> doFilter());
 
         filterPnl.add(new JLabel("🔍 Cari:"));
@@ -82,20 +86,24 @@ public class AllMembersPanel extends JPanel {
         JButton btnAdd = new JButton("➕ Tambah Anggota");
         btnAdd.setBackground(new Color(46, 204, 113)); // Hijau
         btnAdd.setForeground(Color.WHITE);
-        btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnAdd.setFont(new Font("Poppins", Font.BOLD, 12));
         btnAdd.setFocusPainted(false);
         btnAdd.addActionListener(e -> showInputMemberDialog()); // Panggil Popup
 
         // Layout Header
         JPanel actionPanel = new JPanel(new BorderLayout());
         actionPanel.setOpaque(false);
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        btnPanel.setOpaque(false);
+        btnPanel.setFont(new Font("Poppins", Font.PLAIN, 12));
+        btnPanel.add(btnAdd);
         actionPanel.add(filterPnl, BorderLayout.WEST);
-        actionPanel.add(btnAdd, BorderLayout.EAST);
+        actionPanel.add(btnPanel, BorderLayout.EAST);
 
         topContainer.add(title, BorderLayout.NORTH);
         topContainer.add(actionPanel, BorderLayout.CENTER);
 
-        // 2. Table
+        // 2. Table anggota
         String[] cols = { "Nama", "Divisi", "Jabatan" };
         model = new DefaultTableModel(cols, 0) {
             @Override
@@ -105,7 +113,8 @@ public class AllMembersPanel extends JPanel {
         };
         table = new JTable(model);
         table.setRowHeight(25);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setFont(new Font("Poppins", Font.PLAIN, 14));
+        table.getTableHeader().setFont(new Font("Inria Sans", Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(33, 47, 60));
         table.getTableHeader().setForeground(Color.WHITE);
 
@@ -114,6 +123,9 @@ public class AllMembersPanel extends JPanel {
 
         add(topContainer, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Refresh data anggota
+        refreshData();
     }
 
     public void refreshData() {
@@ -145,9 +157,7 @@ public class AllMembersPanel extends JPanel {
         sorter.setRowFilter(RowFilter.andFilter(filters));
     }
 
-    // =================================================================
-    // FITUR POPUP INPUT ANGGOTA (Pindahan dari MemberInputPanel.java)
-    // =================================================================
+    // ==================== TAMBAH ANGGOTA DIALOG ====================
     private void showInputMemberDialog() {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Input Anggota Baru", true);
         dialog.setSize(400, 350);
@@ -156,9 +166,12 @@ public class AllMembersPanel extends JPanel {
 
         JPanel formPanel = new JPanel(new GridLayout(0, 1, 10, 10));
         formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        formPanel.setFont(new Font("Poppins", Font.PLAIN, 12));
 
         JTextField inpName = new JTextField();
+        inpName.setFont(new Font("Poppins", Font.PLAIN, 13));
         JComboBox<String> inpDiv = new JComboBox<>(OrgManager.getInstance().getDivisionNames());
+        inpDiv.setFont(new Font("Poppins", Font.PLAIN, 13));
         JComboBox<String> inpRole = new JComboBox<>();
 
         // Logic Dropdown Dinamis
@@ -176,6 +189,7 @@ public class AllMembersPanel extends JPanel {
         JButton btnSave = new JButton("SIMPAN");
         btnSave.setBackground(new Color(46, 204, 113));
         btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(new Font("Poppins", Font.BOLD, 12));
 
         btnSave.addActionListener(e -> {
             String nm = inpName.getText();

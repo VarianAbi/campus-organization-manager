@@ -20,19 +20,24 @@ public class ProkerPanel extends JPanel {
     // --- LIST VIEW COMPONENTS ---
     private JTable table;
     private DefaultTableModel model;
+    private JTextField searchField;
+    private JComboBox<String> statusFilter;
 
     // --- DETAIL VIEW COMPONENTS ---
     private JLabel lblName, lblStatus, lblDivAsal, lblKetupel, lblWaketupel;
-    private JTextArea txtDesc;
+    private JTextArea txtDesc, txtCatatan;
+    private JProgressBar progressBar;
+    private JLabel lblLampiran;
+    private JList<String> listTim;
     private Proker currentProker; // Untuk menyimpan proker yang sedang dibuka
 
     public ProkerPanel() {
         setLayout(new BorderLayout());
-        setBackground(new Color(244, 246, 247));
+        setBackground(new Color(236, 240, 241)); // Lebih terang
 
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
-        mainContainer.setBackground(new Color(244, 246, 247));
+        mainContainer.setBackground(new Color(236, 240, 241));
 
         // Inisialisasi 2 Tampilan
         initListView();
@@ -50,11 +55,59 @@ public class ProkerPanel extends JPanel {
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        JLabel title = new JLabel("Daftar Program Kerja Seluruh HIMAKOM");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        // --- Atas: Baris Filter + Tombol Tambah Proker ---
+        JPanel topBar = new JPanel(new BorderLayout(10, 10));
+        topBar.setOpaque(true);
+        topBar.setBackground(new Color(41, 128, 185)); // Biru kontras
+
+        JLabel title = new JLabel("📅 Daftar Program Kerja Seluruh HIMAKOM");
+        title.setFont(new Font("Inria Sans", Font.BOLD, 22));
+        title.setForeground(Color.WHITE);
+
+        // Tombol Tambah Proker
+        JButton btnAddProker = new JButton("➕ Tambah Proker");
+        btnAddProker.setBackground(new Color(241, 196, 15));
+        btnAddProker.setForeground(Color.BLACK);
+        btnAddProker.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnAddProker.setFocusPainted(false);
+        btnAddProker.addActionListener(e -> showInputProkerDialog());
+
+        // Filter status
+        statusFilter = new JComboBox<>(new String[]{"Semua Status", "Rencana", "Berjalan", "Selesai"});
+        statusFilter.setSelectedIndex(0);
+        statusFilter.setBackground(Color.WHITE);
+        statusFilter.setForeground(new Color(41, 128, 185));
+        statusFilter.setFont(new Font("Poppins", Font.BOLD, 13));
+        statusFilter.addActionListener(e -> doFilter());
+
+        // Search field
+        searchField = new JTextField(12);
+        searchField.setFont(new Font("Poppins", Font.PLAIN, 13));
+        searchField.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
+        searchField.addActionListener(e -> doFilter());
+
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        filterPanel.setOpaque(false);
+        JLabel lblCari = new JLabel("🔍 Cari:");
+        lblCari.setForeground(Color.WHITE);
+        JLabel lblStatus = new JLabel("  Status:");
+        lblStatus.setForeground(Color.WHITE);
+        filterPanel.add(lblCari);
+        filterPanel.add(searchField);
+        filterPanel.add(lblStatus);
+        filterPanel.add(statusFilter);
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        rightPanel.setOpaque(false);
+        rightPanel.add(btnAddProker);
+
+        topBar.add(title, BorderLayout.WEST);
+        topBar.add(filterPanel, BorderLayout.CENTER);
+        topBar.add(rightPanel, BorderLayout.EAST);
 
         // Tabel Setup
-        String[] cols = { "Nama Proker", "Status", "Divisi Penanggung Jawab", "Ketua Pelaksana" };
+        // Kolom: Nama Proker, DBU, Status, Ketua Pelaksana, Progress
+        String[] cols = { "Nama Proker", "DBU", "Status", "Ketua Pelaksana", "Progress (%)" };
         model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -63,10 +116,16 @@ public class ProkerPanel extends JPanel {
         };
 
         table = new JTable(model);
-        table.setRowHeight(30);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.getTableHeader().setBackground(new Color(33, 47, 60));
+        table.setRowHeight(28);
+        table.setFont(new Font("Poppins", Font.PLAIN, 14));
+        table.getTableHeader().setFont(new Font("Inria Sans", Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(52, 73, 94));
         table.getTableHeader().setForeground(Color.WHITE);
+        table.setSelectionBackground(new Color(255, 234, 167));
+        table.setSelectionForeground(Color.BLACK);
+
+        // HANYA lakukan ini, jangan yang lain!
+        JScrollPane scrollPane = new JScrollPane(table);
 
         // Double Click Listener
         table.addMouseListener(new MouseAdapter() {
@@ -77,11 +136,12 @@ public class ProkerPanel extends JPanel {
             }
         });
 
-        panel.add(title, BorderLayout.NORTH);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        panel.add(topBar, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER); // PASTIKAN INI!
 
-        JLabel hint = new JLabel("ℹ️ Tips: Klik 2x pada baris untuk melihat detail & ubah status.");
-        hint.setForeground(Color.GRAY);
+        JLabel hint = new JLabel("ℹ️ Klik 2x pada baris untuk melihat detail & ubah status.");
+        hint.setForeground(new Color(41, 128, 185));
+        hint.setFont(new Font("Poppins", Font.ITALIC, 12));
         panel.add(hint, BorderLayout.SOUTH);
 
         return panel;
@@ -95,17 +155,40 @@ public class ProkerPanel extends JPanel {
 
         // Header (Tombol Back)
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topBar.setOpaque(false);
+        topBar.setOpaque(true);
+        topBar.setBackground(new Color(41, 128, 185));
         JButton btnBack = new JButton("⬅ Kembali ke List");
         btnBack.setBackground(Color.WHITE);
+        btnBack.setForeground(new Color(41, 128, 185));
+        btnBack.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnBack.setFocusPainted(false);
+        btnBack.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
         btnBack.addActionListener(e -> showList());
         topBar.add(btnBack);
 
-        // Content Card (Kotak Putih)
+        // Tombol edit & hapus (dummy)
+        JButton btnEdit = new JButton("✏️ Edit");
+        btnEdit.setBackground(new Color(255, 234, 167)); // Kuning terang
+        btnEdit.setForeground(new Color(41, 128, 185));
+        btnEdit.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnEdit.setFocusPainted(false);
+        btnEdit.setBorder(BorderFactory.createLineBorder(new Color(241, 196, 15), 2));
+        btnEdit.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur edit belum diimplementasikan."));
+        JButton btnDelete = new JButton("🗑️ Hapus");
+        btnDelete.setBackground(new Color(231, 76, 60));
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnDelete.setFocusPainted(false);
+        btnDelete.setBorder(BorderFactory.createLineBorder(new Color(192, 57, 43), 2));
+        btnDelete.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur hapus belum diimplementasikan."));
+        topBar.add(btnEdit);
+        topBar.add(btnDelete);
+
+        // Content Card (Kotak Putih dengan border biru)
         JPanel card = new JPanel(new GridBagLayout());
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(Color.LIGHT_GRAY),
+                new LineBorder(new Color(41, 128, 185), 3, true),
                 new EmptyBorder(30, 30, 30, 30)));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -115,26 +198,50 @@ public class ProkerPanel extends JPanel {
 
         // Init Components
         lblName = new JLabel("Nama Proker");
-        lblName.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblName.setFont(new Font("Inria Sans", Font.BOLD, 26));
         lblName.setForeground(new Color(41, 128, 185));
 
         lblStatus = new JLabel("Status: -");
-        lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblStatus.setFont(new Font("Poppins", Font.BOLD, 15));
         lblStatus.setOpaque(true);
         lblStatus.setBorder(new EmptyBorder(5, 10, 5, 10));
 
-        lblDivAsal = new JLabel("Divisi: -");
-        lblKetupel = new JLabel("Ketupel: -");
-        lblWaketupel = new JLabel("Waketupel: -");
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setStringPainted(true);
+        progressBar.setValue(0);
+        progressBar.setForeground(new Color(41, 128, 185));
+        progressBar.setBackground(new Color(236, 240, 241));
 
-        txtDesc = new JTextArea(5, 40);
+        lblDivAsal = new JLabel("Divisi: -");
+        lblKetupel = new JLabel("Ketua Pelaksana: -");
+        lblWaketupel = new JLabel("Wakil Ketua Pelaksana: -");
+
+        txtDesc = new JTextArea(4, 40);
         txtDesc.setEditable(false);
-        txtDesc.setBorder(BorderFactory.createTitledBorder("Divisi/Seksi Internal Proker"));
-        txtDesc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        txtDesc.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)), "Divisi/Seksi Internal Proker"));
+        txtDesc.setFont(new Font("Poppins", Font.PLAIN, 13));
+
+        // Lampiran (dummy)
+        lblLampiran = new JLabel("Lampiran: - (belum ada)");
+        lblLampiran.setFont(new Font("Poppins", Font.ITALIC, 12));
+        lblLampiran.setForeground(new Color(127, 140, 141));
+
+        // Catatan (dummy)
+        txtCatatan = new JTextArea(2, 40);
+        txtCatatan.setEditable(false);
+        txtCatatan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)), "Catatan/Update"));
+        txtCatatan.setText("-");
+
+        // Daftar tim (dummy)
+        listTim = new JList<>(new String[]{"(belum ada data tim)"});
+        listTim.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)), "Tim Pelaksana"));
 
         JButton btnUpdate = new JButton("Ubah Status (Cycle)");
-        btnUpdate.setBackground(new Color(230, 126, 34)); // Orange
+        btnUpdate.setBackground(new Color(41, 128, 185));
         btnUpdate.setForeground(Color.WHITE);
+        btnUpdate.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnUpdate.setFocusPainted(false);
+        btnUpdate.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
         btnUpdate.addActionListener(e -> actionUpdateStatus());
 
         // Layouting
@@ -145,26 +252,37 @@ public class ProkerPanel extends JPanel {
         gbc.gridy = 1;
         card.add(lblStatus, gbc);
         gbc.gridy = 2;
+        card.add(progressBar, gbc);
+        gbc.gridy = 3;
         card.add(new JSeparator(), gbc);
 
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 1;
         card.add(lblDivAsal, gbc);
         gbc.gridx = 1;
         card.add(new JLabel(""), gbc); // Spacer
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         card.add(lblKetupel, gbc);
         gbc.gridx = 1;
         card.add(lblWaketupel, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         card.add(new JScrollPane(txtDesc), gbc);
 
-        gbc.gridy = 6;
+        gbc.gridy = 7;
+        card.add(lblLampiran, gbc);
+
+        gbc.gridy = 8;
+        card.add(new JScrollPane(txtCatatan), gbc);
+
+        gbc.gridy = 9;
+        card.add(new JScrollPane(listTim), gbc);
+
+        gbc.gridy = 10;
         card.add(btnUpdate, gbc);
 
         panel.add(topBar, BorderLayout.NORTH);
@@ -175,7 +293,6 @@ public class ProkerPanel extends JPanel {
 
     // ==================== LOGIC METHODS ====================
 
-    // Dipanggil dari MainFrame saat menu diklik
     public void refreshData() {
         model.setRowCount(0);
         String[] divNames = OrgManager.getInstance().getDivisionNames();
@@ -185,13 +302,28 @@ public class ProkerPanel extends JPanel {
             if (div != null) {
                 for (Proker p : div.getProkerList()) {
                     model.addRow(new Object[] {
-                            p.getNamaProker(),
-                            p.getStatus(),
-                            dName,
-                            p.getKetupel()
+                        p.getNamaProker(),
+                        dName, // DBU/Divisi
+                        p.getStatus(),
+                        p.getKetupel(),
+                        p.getProgress()
                     });
                 }
             }
+        }
+        doFilter();
+    }
+
+    private void doFilter() {
+        String search = searchField.getText().trim().toLowerCase();
+        String status = (String) statusFilter.getSelectedItem();
+        for (int i = model.getRowCount() - 1; i >= 0; i--) {
+            String nama = ((String) model.getValueAt(i, 0)).toLowerCase();
+            String stat = ((String) model.getValueAt(i, 1));
+            boolean match = true;
+            if (!search.isEmpty() && !nama.contains(search)) match = false;
+            if (!"Semua Status".equals(status) && !stat.equals(status)) match = false;
+            if (!match) model.removeRow(i);
         }
     }
 
@@ -204,7 +336,6 @@ public class ProkerPanel extends JPanel {
         String pName = (String) model.getValueAt(modelRow, 0);
         String pDivName = (String) model.getValueAt(modelRow, 2);
 
-        // Cari Objek Proker Asli
         Division div = OrgManager.getInstance().getDivisionByName(pDivName);
         if (div != null) {
             for (Proker p : div.getProkerList()) {
@@ -225,20 +356,31 @@ public class ProkerPanel extends JPanel {
         lblName.setText(currentProker.getNamaProker());
         lblDivAsal.setText("Divisi Penanggung Jawab: " + currentProker.getParentDivisi());
         lblKetupel.setText("Ketua Pelaksana: " + currentProker.getKetupel());
-        lblWaketupel.setText("Wakil Ketupel: " + currentProker.getWaketupel());
+        lblWaketupel.setText("Wakil Ketua Pelaksana: " + currentProker.getWaketupel());
         txtDesc.setText(currentProker.getDeskripsiDivisi());
 
         updateStatusLabel(currentProker.getStatus());
+        int prog = currentProker.getProgress();
+        progressBar.setValue(prog);
+        progressBar.setString(prog + "%");
+
+        lblLampiran.setText("Lampiran: - (belum ada)");
+        txtCatatan.setText("-");
+        listTim.setListData(new String[]{"(belum ada data tim)"});
     }
 
     private void updateStatusLabel(String status) {
         lblStatus.setText("Status: " + status);
-        if (status.equals("Selesai"))
-            lblStatus.setBackground(new Color(46, 204, 113)); // Hijau
-        else if (status.equals("Berjalan"))
-            lblStatus.setBackground(new Color(52, 152, 219)); // Biru
-        else
-            lblStatus.setBackground(new Color(241, 196, 15)); // Kuning
+        if (status.equals("Selesai")) {
+            lblStatus.setBackground(new Color(46, 204, 113));
+            lblStatus.setForeground(Color.WHITE);
+        } else if (status.equals("Berjalan")) {
+            lblStatus.setBackground(new Color(52, 152, 219));
+            lblStatus.setForeground(Color.WHITE);
+        } else {
+            lblStatus.setBackground(new Color(241, 196, 15));
+            lblStatus.setForeground(new Color(44, 62, 80));
+        }
     }
 
     private void actionUpdateStatus() {
@@ -246,7 +388,6 @@ public class ProkerPanel extends JPanel {
             return;
 
         String s = currentProker.getStatus();
-        // Cycle: Rencana -> Berjalan -> Selesai -> Rencana
         if (s.equals("Rencana"))
             currentProker.setStatus("Berjalan");
         else if (s.equals("Berjalan"))
@@ -256,17 +397,73 @@ public class ProkerPanel extends JPanel {
 
         updateStatusLabel(currentProker.getStatus());
         JOptionPane.showMessageDialog(this, "Status diubah menjadi: " + currentProker.getStatus());
+        if (currentProker.getStatus().equals("Rencana")) currentProker.setProgress(0);
+        else if (currentProker.getStatus().equals("Berjalan")) currentProker.setProgress(50);
+        else currentProker.setProgress(100);
+        progressBar.setValue(currentProker.getProgress());
+        progressBar.setString(currentProker.getProgress() + "%");
     }
 
     private void showList() {
-        refreshData(); // Refresh tabel saat kembali
+        refreshData();
         cardLayout.show(mainContainer, "LIST");
     }
 
-    // Init Component (Kosong, dipanggil di Constructor)
-    private void initListView() {
+    // ==================== TAMBAH PROKER DIALOG (Sederhana) ====================
+    private void showInputProkerDialog() {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Input Program Kerja Baru", true);
+        dialog.setSize(400, 420);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 10, 10));
+        formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        JTextField inpNama = new JTextField();
+        JComboBox<String> inpDiv = new JComboBox<>(OrgManager.getInstance().getDivisionNames());
+        JTextField inpKetupel = new JTextField();
+        JTextField inpWaketupel = new JTextField();
+        JTextArea inpDesc = new JTextArea(3, 20);
+
+        JButton btnSave = new JButton("SIMPAN");
+        btnSave.setBackground(new Color(46, 204, 113));
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(new Font("Poppins", Font.BOLD, 12));
+
+        btnSave.addActionListener(e -> {
+            String nama = inpNama.getText().trim();
+            String div = (String) inpDiv.getSelectedItem();
+            String ketupel = inpKetupel.getText().trim();
+            String waketupel = inpWaketupel.getText().trim();
+            String desc = inpDesc.getText().trim();
+            if (nama.isEmpty() || ketupel.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Nama Proker & Ketupel wajib diisi!");
+                return;
+            }
+            Proker p = new Proker(nama, desc, ketupel, waketupel, "Rencana", 0, div);
+            OrgManager.getInstance().getDivisionByName(div).addProker(p);
+            JOptionPane.showMessageDialog(dialog, "Berhasil Input Proker: " + nama);
+            dialog.dispose();
+            refreshData();
+        });
+
+        formPanel.add(new JLabel("Nama Proker:"));
+        formPanel.add(inpNama);
+        formPanel.add(new JLabel("Divisi Penanggung Jawab:"));
+        formPanel.add(inpDiv);
+        formPanel.add(new JLabel("Ketua Pelaksana:"));
+        formPanel.add(inpKetupel);
+        formPanel.add(new JLabel("Wakil Pelaksana:"));
+        formPanel.add(inpWaketupel);
+        formPanel.add(new JLabel("Deskripsi:"));
+        formPanel.add(new JScrollPane(inpDesc));
+        formPanel.add(btnSave);
+
+        dialog.add(formPanel, BorderLayout.CENTER);
+        dialog.setVisible(true);
     }
 
-    private void initDetailView() {
-    }
+    // Init Component (Kosong, dipanggil di Constructor)
+    private void initListView() {}
+    private void initDetailView() {}
 }

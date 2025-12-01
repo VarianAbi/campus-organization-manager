@@ -92,7 +92,7 @@ public class MainFrame extends JFrame {
 
         JLabel title = new JLabel("HIMAKOM APP");
         title.setForeground(Color.WHITE);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setFont(new Font("Inria Sans", Font.BOLD, 20));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         logoPnl.add(imageLabel);
@@ -108,6 +108,7 @@ public class MainFrame extends JFrame {
         sidebarPanel.add(Box.createVerticalGlue());
 
         JLabel credit = new JLabel("© 2024 Kelompok 2C", SwingConstants.CENTER);
+        credit.setFont(new Font("Poppins", Font.PLAIN, 11));
         credit.setForeground(Color.GRAY);
         credit.setAlignmentX(Component.CENTER_ALIGNMENT);
         sidebarPanel.add(credit);
@@ -122,7 +123,7 @@ public class MainFrame extends JFrame {
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btn.setFont(new Font("Poppins", Font.PLAIN, 14));
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
