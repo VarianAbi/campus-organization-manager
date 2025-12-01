@@ -15,6 +15,7 @@ com\campusorg\database\DataStore.class
 com\campusorg\models\Division.class
 com\campusorg\gui\panels\ProkerPanel$2.class
 com\campusorg\services\OrgManager.class
+com\campusorg\gui\panels\AllMembersPanel$1.class
 com\campusorg\models\Member.class
 com\campusorg\gui\panels\HomePanel.class
 com\campusorg\patterns\NewsPublisher.class

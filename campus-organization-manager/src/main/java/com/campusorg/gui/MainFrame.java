@@ -1,51 +1,69 @@
 package com.campusorg.gui;
 
-import com.campusorg.gui.panels.*; 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import com.campusorg.gui.panels.AllMembersPanel;
+import com.campusorg.gui.panels.HomePanel;
+import com.campusorg.gui.panels.ProkerPanel;
 
 public class MainFrame extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel contentPanel;
     private JPanel sidebarPanel;
-    
-    // PANEL MODULAR
-    private HomePanel homePanel; // <-- SEKARANG PAKAI CLASS SENDIRI
+
+    // PANEL MODULAR (InputPanel SUDAH DIHAPUS)
+    private HomePanel homePanel;
     private AllMembersPanel allMembersPanel;
-    private MemberInputPanel inputPanel;
     private ProkerPanel prokerPanel;
-    
+
     private final Color COL_SIDEBAR = new Color(33, 47, 60);
-    private final Color COL_ACTIVE  = new Color(52, 73, 94);
-    private final Color COL_BG      = new Color(244, 246, 247);
+    private final Color COL_ACTIVE = new Color(52, 73, 94);
+    private final Color COL_BG = new Color(244, 246, 247);
 
     public MainFrame() {
         setTitle("HIMAKOM App (Final Version)");
-        setSize(1200, 750);
+        setSize(1280, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        // 1. Setup Content
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
         contentPanel.setBackground(COL_BG);
 
-        // INIT SEMUA PANEL
-        homePanel = new HomePanel(); // <-- Ini memuat Dashboard + Grid + Detail Divisi
-        allMembersPanel = new AllMembersPanel();
-        inputPanel = new MemberInputPanel();
+        // 2. INIT PANELS (Tidak perlu navigasi lambda lagi)
+        homePanel = new HomePanel();
+        allMembersPanel = new AllMembersPanel(); // Tombol input sudah ada di dalam panel ini
         prokerPanel = new ProkerPanel();
-        
+
+        // 3. Add Panels
         contentPanel.add(homePanel, "HOME");
         contentPanel.add(allMembersPanel, "DATA");
-        contentPanel.add(inputPanel, "INPUT");
         contentPanel.add(prokerPanel, "PROKER");
 
+        // 4. Sidebar
         initSidebar();
 
         add(sidebarPanel, BorderLayout.WEST);
@@ -58,6 +76,7 @@ public class MainFrame extends JFrame {
         sidebarPanel.setBackground(COL_SIDEBAR);
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
 
+        // --- Logo Area ---
         JPanel logoPnl = new JPanel();
         logoPnl.setLayout(new BoxLayout(logoPnl, BoxLayout.Y_AXIS));
         logoPnl.setBackground(COL_SIDEBAR);
@@ -66,8 +85,10 @@ public class MainFrame extends JFrame {
         JLabel imageLabel = new JLabel();
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         ImageIcon logoIcon = loadIcon("logo_himakom.png", 80, 80);
-        if (logoIcon != null) imageLabel.setIcon(logoIcon);
-        else imageLabel.setText("<html><h2 style='color:white;'>[LOGO]</h2></html>");
+        if (logoIcon != null)
+            imageLabel.setIcon(logoIcon);
+        else
+            imageLabel.setText("<html><h2 style='color:white;'>[LOGO]</h2></html>");
 
         JLabel title = new JLabel("HIMAKOM APP");
         title.setForeground(Color.WHITE);
@@ -79,12 +100,18 @@ public class MainFrame extends JFrame {
         logoPnl.add(title);
         sidebarPanel.add(logoPnl);
 
+        // --- MENU BUTTONS ---
         addSidebarBtn("🏠  Home Dashboard", "HOME");
         addSidebarBtn("👥  Data Anggota", "DATA");
-        addSidebarBtn("📝  Input Anggota", "INPUT");
         addSidebarBtn("📅  Program Kerja", "PROKER");
 
         sidebarPanel.add(Box.createVerticalGlue());
+
+        JLabel credit = new JLabel("© 2024 Kelompok 2C", SwingConstants.CENTER);
+        credit.setForeground(Color.GRAY);
+        credit.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidebarPanel.add(credit);
+        sidebarPanel.add(Box.createVerticalStrut(20));
     }
 
     private void addSidebarBtn(String text, String targetCard) {
@@ -100,15 +127,23 @@ public class MainFrame extends JFrame {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) { btn.setBackground(COL_ACTIVE); }
-            public void mouseExited(MouseEvent e) { btn.setBackground(COL_SIDEBAR); }
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(COL_ACTIVE);
+            }
+
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(COL_SIDEBAR);
+            }
         });
 
         btn.addActionListener(e -> {
-            if (targetCard.equals("HOME")) homePanel.refreshData(); // Refresh Home saat diklik
-            if (targetCard.equals("DATA")) allMembersPanel.refreshData();
-            if (targetCard.equals("PROKER")) prokerPanel.refreshData();
-            
+            if (targetCard.equals("HOME"))
+                homePanel.refreshData();
+            if (targetCard.equals("DATA"))
+                allMembersPanel.refreshData();
+            if (targetCard.equals("PROKER"))
+                prokerPanel.refreshData();
+
             cardLayout.show(contentPanel, targetCard);
         });
 
@@ -125,6 +160,8 @@ public class MainFrame extends JFrame {
                 return new ImageIcon(scaledImage);
             }
             return null;
-        } catch (Exception e) { return null; }
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
