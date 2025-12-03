@@ -26,11 +26,11 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
-import com.campusorg.models.Division;
-import com.campusorg.models.Member;
-import com.campusorg.models.OrgComponent;
-import com.campusorg.patterns.MemberFactory;
-import com.campusorg.services.OrgManager;
+import com.campusorg.patterns.composite.Division;
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.composite.OrgComponent;
+import com.campusorg.patterns.factory.MemberFactory;
+import com.campusorg.patterns.singleton.OrgManager;
 
 public class AllMembersPanel extends JPanel {
     private JTable table;

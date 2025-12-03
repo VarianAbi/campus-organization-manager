@@ -1,7 +1,10 @@
-package com.campusorg.services;
+package com.campusorg.patterns.singleton;
 
 import com.campusorg.models.*;
-import com.campusorg.patterns.NewsPublisher;
+import com.campusorg.patterns.composite.Division;
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.observer.NewsPublisher;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap; // Pakai LinkedHashMap biar urutannya rapi

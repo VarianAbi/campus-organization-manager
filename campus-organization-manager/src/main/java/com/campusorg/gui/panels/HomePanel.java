@@ -1,8 +1,11 @@
 package com.campusorg.gui.panels;
 
 import com.campusorg.models.*;
-import com.campusorg.patterns.MemberFactory; // Pastikan import ini ada
-import com.campusorg.services.OrgManager;
+import com.campusorg.patterns.composite.Division;
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.composite.OrgComponent;
+import com.campusorg.patterns.factory.MemberFactory;
+import com.campusorg.patterns.singleton.OrgManager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

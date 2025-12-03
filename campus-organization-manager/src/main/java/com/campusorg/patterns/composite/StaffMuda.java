@@ -1,4 +1,4 @@
-package com.campusorg.models;
+package com.campusorg.patterns.composite;
 
 public class StaffMuda extends Member {
     public StaffMuda(String name, String id) {

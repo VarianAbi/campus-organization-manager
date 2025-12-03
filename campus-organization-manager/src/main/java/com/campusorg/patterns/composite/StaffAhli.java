@@ -1,4 +1,4 @@
-package com.campusorg.models;
+package com.campusorg.patterns.composite;
 
 public class StaffAhli extends Member {
     public StaffAhli(String name, String id) {

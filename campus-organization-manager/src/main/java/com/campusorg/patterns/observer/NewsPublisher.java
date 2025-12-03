@@ -1,8 +1,9 @@
-package com.campusorg.patterns;
+package com.campusorg.patterns.observer;
 
-import com.campusorg.models.Member;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.campusorg.patterns.composite.Member;
 
 public class NewsPublisher {
     private List<Member> observers = new ArrayList<>();

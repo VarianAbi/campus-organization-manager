@@ -1,6 +1,10 @@
-package com.campusorg.patterns;
+package com.campusorg.patterns.factory;
 
 import com.campusorg.models.*;
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.composite.OfficeHolder;
+import com.campusorg.patterns.composite.StaffAhli;
+import com.campusorg.patterns.composite.StaffMuda;
 
 public class MemberFactory {
     public static Member createMember(String type, String specificTitle, String name, String id) {

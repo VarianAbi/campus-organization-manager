@@ -1,4 +1,4 @@
-package com.campusorg.models;
+package com.campusorg.patterns.composite;
 
 public interface OrgComponent {
     void showDetails();

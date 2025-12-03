@@ -1,7 +1,9 @@
-package com.campusorg.models;
+package com.campusorg.patterns.composite;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.campusorg.models.Proker;
 
 public class Division implements OrgComponent {
     private String divisionName;

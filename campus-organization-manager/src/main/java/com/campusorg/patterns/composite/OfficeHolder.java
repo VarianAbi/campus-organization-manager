@@ -1,4 +1,4 @@
-package com.campusorg.models;
+package com.campusorg.patterns.composite;
 
 public class OfficeHolder extends Member {
     private String jobTitle; // Contoh: "Ketua Himpunan", "Kepala MSDH", "Ketua Departemen"

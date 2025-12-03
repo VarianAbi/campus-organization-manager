@@ -32,9 +32,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.campusorg.models.Division;
 import com.campusorg.models.Proker;
-import com.campusorg.services.OrgManager;
+import com.campusorg.patterns.composite.Division;
+import com.campusorg.patterns.singleton.OrgManager;
 
 public class ProkerPanel extends JPanel {
 

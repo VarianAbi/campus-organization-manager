@@ -1,4 +1,4 @@
-package com.campusorg.models;
+package com.campusorg.patterns.composite;
 
 import java.util.ArrayList;
 import java.util.List;
