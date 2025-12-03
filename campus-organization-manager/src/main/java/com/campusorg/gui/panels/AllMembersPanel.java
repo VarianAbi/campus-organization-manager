@@ -71,7 +71,7 @@ public class AllMembersPanel extends JPanel {
 
         JButton btnFilter = new JButton("Terapkan Filter");
         btnFilter.setBackground(new Color(52, 152, 219));
-        btnFilter.setForeground(Color.WHITE);
+        btnFilter.setForeground(Color.black);
         btnFilter.setFont(new Font("Poppins", Font.BOLD, 12));
         btnFilter.addActionListener(e -> doFilter());
 
@@ -84,7 +84,7 @@ public class AllMembersPanel extends JPanel {
         // --- TOMBOL TAMBAH ANGGOTA (POPUP) ---
         JButton btnAdd = new JButton("➕ Tambah Anggota");
         btnAdd.setBackground(new Color(46, 204, 113)); // Hijau
-        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setForeground(Color.BLACK);
         btnAdd.setFont(new Font("Poppins", Font.BOLD, 12));
         btnAdd.setFocusPainted(false);
         btnAdd.addActionListener(e -> showInputMemberDialog()); // Panggil Popup
@@ -115,7 +115,7 @@ public class AllMembersPanel extends JPanel {
         table.setFont(new Font("Poppins", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Inria Sans", Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(33, 47, 60));
-        table.getTableHeader().setForeground(Color.WHITE);
+        table.getTableHeader().setForeground(Color.BLACK);
 
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
@@ -187,7 +187,7 @@ public class AllMembersPanel extends JPanel {
 
         JButton btnSave = new JButton("SIMPAN");
         btnSave.setBackground(new Color(46, 204, 113));
-        btnSave.setForeground(Color.WHITE);
+        btnSave.setForeground(Color.black);
         btnSave.setFont(new Font("Poppins", Font.BOLD, 12));
 
         btnSave.addActionListener(e -> {
