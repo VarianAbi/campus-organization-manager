@@ -1,0 +1,5 @@
+com\campusorg\patterns\NewsPublisherTest.class
+com\campusorg\models\CompositePatternTest.class
+com\campusorg\patterns\MemberFactoryTest.class
+com\campusorg\AppTest.class
+com\campusorg\services\OrgManagerTest.class
