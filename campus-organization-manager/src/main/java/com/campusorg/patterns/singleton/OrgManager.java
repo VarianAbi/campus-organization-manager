@@ -1,13 +1,11 @@
 package com.campusorg.patterns.singleton;
 
-import com.campusorg.models.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.campusorg.patterns.composite.Division;
 import com.campusorg.patterns.composite.Member;
 import com.campusorg.patterns.observer.NewsPublisher;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedHashMap; // Pakai LinkedHashMap biar urutannya rapi
 
 public class OrgManager {
     private static OrgManager instance;
@@ -15,9 +13,9 @@ public class OrgManager {
     private Division rootOrg; // HIMAKOM
     
     // Map untuk Dropdown & Pencarian
-    private Map<String, Division> divisionMap = new LinkedHashMap<>();
+    private final Map<String, Division> divisionMap = new LinkedHashMap<>();
     
-    private NewsPublisher publisher;
+    private final NewsPublisher publisher;
 
     private OrgManager() {
         publisher = new NewsPublisher();
@@ -85,7 +83,7 @@ public class OrgManager {
     }
 
     public String[] getDivisionNames() {
-        return divisionMap.keySet().toArray(new String[0]);
+        return divisionMap.keySet().toArray(new String[divisionMap.size()]);
     }
 
     public void registerMember(Division div, Member m) {

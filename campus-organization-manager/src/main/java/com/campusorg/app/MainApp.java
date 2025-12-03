@@ -1,11 +1,17 @@
 package com.campusorg.app;
 
-import com.campusorg.gui.MainFrame;
+import java.util.logging.Logger;
+
 import javax.swing.SwingUtilities;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import com.campusorg.gui.MainFrame;
 
 public class MainApp {
+    private static final Logger logger = Logger.getLogger(MainApp.class.getName());
+    
     public static void main(String[] args) {
-        System.out.println("Aplikasi Campus Organization Manager sedang berjalan...");
+        logger.info("Aplikasi Campus Organization Manager sedang berjalan...");
         
         // Menjalankan GUI di Event Dispatch Thread (Standar Java Swing)
         SwingUtilities.invokeLater(() -> {
@@ -14,8 +20,8 @@ public class MainApp {
                 javax.swing.UIManager.setLookAndFeel(
                     javax.swing.UIManager.getSystemLookAndFeelClassName()
                 );
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException _) {
+                // UI look and feel could not be set, using default
             }
 
             MainFrame frame = new MainFrame();

@@ -1,10 +1,17 @@
 package com.campusorg.patterns;
 
-import com.campusorg.models.*;
-import com.campusorg.patterns.composite.*;
-import com.campusorg.patterns.factory.MemberFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.composite.OfficeHolder;
+import com.campusorg.patterns.composite.StaffAhli;
+import com.campusorg.patterns.composite.StaffMuda;
+import com.campusorg.patterns.factory.MemberFactory;
 
 /**
  * Unit test untuk Factory Pattern - MemberFactory

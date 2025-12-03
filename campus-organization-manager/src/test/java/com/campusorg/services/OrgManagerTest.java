@@ -1,12 +1,17 @@
 package com.campusorg.services;
 
-import com.campusorg.models.*;
-import com.campusorg.patterns.composite.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import com.campusorg.patterns.composite.Division;
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.composite.StaffMuda;
 import com.campusorg.patterns.observer.NewsPublisher;
 import com.campusorg.patterns.singleton.OrgManager;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
 
 /**
  * Unit test untuk Singleton Pattern - OrgManager

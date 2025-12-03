@@ -38,8 +38,9 @@ import com.campusorg.patterns.singleton.OrgManager;
 
 public class ProkerPanel extends JPanel {
 
-    private CardLayout cardLayout;
-    private JPanel mainContainer;
+    private static final String FONT_INRIA_SANS = "Inria Sans";
+    private final CardLayout cardLayout;
+    private final JPanel mainContainer;
 
     // --- LIST VIEW COMPONENTS ---
     private JTable table;
@@ -48,12 +49,17 @@ public class ProkerPanel extends JPanel {
     private JComboBox<String> statusFilter;
 
     // --- DETAIL VIEW COMPONENTS ---
-    private JLabel lblName, lblStatus, lblDivAsal, lblKetupel, lblWaketupel;
-    private JTextArea txtDesc, txtCatatan;
+    private JLabel lblName;
+    private JLabel lblStatus;
+    private JLabel lblDivAsal;
+    private JLabel lblKetupel;
+    private JLabel lblWaketupel;
+    private JTextArea txtDesc;
+    private JTextArea txtCatatan;
     private JProgressBar progressBar;
     private JLabel lblLampiran;
     private JList<String> listTim;
-    private Proker currentProker; // Untuk menyimpan proker yang sedang dibuka
+    private transient Proker currentProker; // Untuk menyimpan proker yang sedang dibuka
 
     public ProkerPanel() {
         setLayout(new BorderLayout());
@@ -82,9 +88,9 @@ public class ProkerPanel extends JPanel {
         // --- Header & Filter Bar mengikuti AllMembersPanel ---
         JPanel topContainer = new JPanel(new BorderLayout(10, 10));
         topContainer.setOpaque(false);
-
         JLabel title = new JLabel("📅 Daftar Program Kerja Seluruh HIMAKOM");
-        title.setFont(new Font("Inria Sans", Font.BOLD, 22));
+        title.setFont(new Font(FONT_INRIA_SANS, Font.BOLD, 22));
+        title.setForeground(Color.BLACK);
         title.setForeground(Color.BLACK);
 
         // Tombol Tambah Proker
@@ -96,7 +102,7 @@ public class ProkerPanel extends JPanel {
         btnAddProker.addActionListener(e -> showInputProkerDialog());
 
         // Filter status
-        statusFilter = new JComboBox<>(new String[]{"Semua Status", "Rencana", "Berjalan", "Selesai"});
+        statusFilter = new JComboBox<>(new String[] { "Semua Status", "Rencana", "Berjalan", "Selesai" });
         statusFilter.setSelectedIndex(0);
         statusFilter.setBackground(Color.WHITE);
         statusFilter.setForeground(new Color(41, 128, 185));
@@ -142,11 +148,11 @@ public class ProkerPanel extends JPanel {
                 return false;
             }
         };
-
         table = new JTable(model);
         table.setRowHeight(28);
         table.setFont(new Font("Poppins", Font.PLAIN, 14));
-        table.getTableHeader().setFont(new Font("Inria Sans", Font.BOLD, 14));
+        table.getTableHeader().setFont(new Font(FONT_INRIA_SANS, Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(52, 73, 94));
         table.getTableHeader().setBackground(new Color(52, 73, 94));
         table.getTableHeader().setForeground(Color.BLACK);
         table.setSelectionBackground(new Color(255, 234, 167));
@@ -157,6 +163,7 @@ public class ProkerPanel extends JPanel {
 
         // Double Click Listener
         table.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     openSelectedProker();
@@ -224,9 +231,9 @@ public class ProkerPanel extends JPanel {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Init Components
         lblName = new JLabel("Nama Proker");
-        lblName.setFont(new Font("Inria Sans", Font.BOLD, 26));
+        lblName.setFont(new Font(FONT_INRIA_SANS, Font.BOLD, 26));
+        lblName.setForeground(new Color(41, 128, 185));
         lblName.setForeground(new Color(41, 128, 185));
 
         lblStatus = new JLabel("Status: -");
@@ -246,7 +253,8 @@ public class ProkerPanel extends JPanel {
 
         txtDesc = new JTextArea(4, 40);
         txtDesc.setEditable(false);
-        txtDesc.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)), "Divisi/Seksi Internal Proker"));
+        txtDesc.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)),
+                "Divisi/Seksi Internal Proker"));
         txtDesc.setFont(new Font("Poppins", Font.PLAIN, 13));
 
         // Lampiran (dummy)
@@ -257,12 +265,14 @@ public class ProkerPanel extends JPanel {
         // Catatan (dummy)
         txtCatatan = new JTextArea(2, 40);
         txtCatatan.setEditable(false);
-        txtCatatan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)), "Catatan/Update"));
+        txtCatatan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)),
+                "Catatan/Update"));
         txtCatatan.setText("-");
 
         // Daftar tim (dummy)
-        listTim = new JList<>(new String[]{"(belum ada data tim)"});
-        listTim.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)), "Tim Pelaksana"));
+        listTim = new JList<>(new String[] { "(belum ada data tim)" });
+        listTim.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)),
+                "Tim Pelaksana"));
 
         JButton btnUpdate = new JButton("Ubah Status (Cycle)");
         btnUpdate.setBackground(new Color(41, 128, 185));
@@ -330,11 +340,11 @@ public class ProkerPanel extends JPanel {
             if (div != null) {
                 for (Proker p : div.getProkerList()) {
                     model.addRow(new Object[] {
-                        p.getNamaProker(),
-                        dName, // DBU/Divisi
-                        p.getStatus(),
-                        p.getKetupel(),
-                        p.getProgress()
+                            p.getNamaProker(),
+                            dName, // DBU/Divisi
+                            p.getStatus(),
+                            p.getKetupel(),
+                            p.getProgress()
                     });
                 }
             }
@@ -349,9 +359,12 @@ public class ProkerPanel extends JPanel {
             String nama = ((String) model.getValueAt(i, 0)).toLowerCase();
             String stat = ((String) model.getValueAt(i, 2));
             boolean match = true;
-            if (!search.isEmpty() && !nama.contains(search)) match = false;
-            if (!"Semua Status".equals(status) && !stat.equals(status)) match = false;
-            if (!match) model.removeRow(i);
+            if (!search.isEmpty() && !nama.contains(search))
+                match = false;
+            if (!"Semua Status".equals(status) && !stat.equals(status))
+                match = false;
+            if (!match)
+                model.removeRow(i);
         }
     }
 
@@ -394,20 +407,24 @@ public class ProkerPanel extends JPanel {
 
         lblLampiran.setText("Lampiran: - (belum ada)");
         txtCatatan.setText("-");
-        listTim.setListData(new String[]{"(belum ada data tim)"});
+        listTim.setListData(new String[] { "(belum ada data tim)" });
     }
 
     private void updateStatusLabel(String status) {
         lblStatus.setText("Status: " + status);
-        if (status.equals("Selesai")) {
-            lblStatus.setBackground(new Color(46, 204, 113));
-            lblStatus.setForeground(Color.WHITE);
-        } else if (status.equals("Berjalan")) {
-            lblStatus.setBackground(new Color(52, 152, 219));
-            lblStatus.setForeground(Color.WHITE);
-        } else {
-            lblStatus.setBackground(new Color(241, 196, 15));
-            lblStatus.setForeground(new Color(44, 62, 80));
+        switch (status) {
+            case "Selesai" -> {
+                lblStatus.setBackground(new Color(46, 204, 113));
+                lblStatus.setForeground(Color.WHITE);
+            }
+            case "Berjalan" -> {
+                lblStatus.setBackground(new Color(52, 152, 219));
+                lblStatus.setForeground(Color.WHITE);
+            }
+            default -> {
+                lblStatus.setBackground(new Color(241, 196, 15));
+                lblStatus.setForeground(new Color(44, 62, 80));
+            }
         }
     }
 
@@ -416,18 +433,19 @@ public class ProkerPanel extends JPanel {
             return;
 
         String s = currentProker.getStatus();
-        if (s.equals("Rencana"))
-            currentProker.setStatus("Berjalan");
-        else if (s.equals("Berjalan"))
-            currentProker.setStatus("Selesai");
-        else
-            currentProker.setStatus("Rencana");
+        switch (s) {
+            case "Rencana" -> currentProker.setStatus("Berjalan");
+            case "Berjalan" -> currentProker.setStatus("Selesai");
+            default -> currentProker.setStatus("Rencana");
+        }
 
         updateStatusLabel(currentProker.getStatus());
         JOptionPane.showMessageDialog(this, "Status diubah menjadi: " + currentProker.getStatus());
-        if (currentProker.getStatus().equals("Rencana")) currentProker.setProgress(0);
-        else if (currentProker.getStatus().equals("Berjalan")) currentProker.setProgress(50);
-        else currentProker.setProgress(100);
+        switch (currentProker.getStatus()) {
+            case "Rencana" -> currentProker.setProgress(0);
+            case "Berjalan" -> currentProker.setProgress(50);
+            default -> currentProker.setProgress(100);
+        }
         progressBar.setValue(currentProker.getProgress());
         progressBar.setString(currentProker.getProgress() + "%");
     }
@@ -492,6 +510,15 @@ public class ProkerPanel extends JPanel {
     }
 
     // Init Component (Kosong, dipanggil di Constructor)
-    private void initListView() {}
-    private void initDetailView() {}
+    private void initListView() {
+        // Method intentionally left empty because list view initialization is handled
+        // in createListViewPanel().
+        // If implementation is needed in the future, remove the exception below.
+    }
+
+    private void initDetailView() {
+        // Method intentionally left empty because detail view initialization is handled
+        // in createDetailViewPanel().
+        // If implementation is needed in the future, remove the exception below.
+    }
 }

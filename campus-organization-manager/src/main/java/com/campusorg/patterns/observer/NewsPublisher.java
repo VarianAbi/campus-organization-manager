@@ -6,7 +6,7 @@ import java.util.List;
 import com.campusorg.patterns.composite.Member;
 
 public class NewsPublisher {
-    private List<Member> observers = new ArrayList<>();
+    private final List<Member> observers = new ArrayList<>();
 
     public void subscribe(Member member) {
         observers.add(member);

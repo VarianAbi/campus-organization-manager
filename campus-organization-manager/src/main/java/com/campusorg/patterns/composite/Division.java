@@ -6,11 +6,11 @@ import java.util.List;
 import com.campusorg.models.Proker;
 
 public class Division implements OrgComponent {
-    private String divisionName;
-    private List<OrgComponent> members = new ArrayList<>();
+    private final String divisionName;
+    private final List<OrgComponent> members = new ArrayList<>();
     
     // --- TAMBAHAN BARU (PROKER) ---
-    private List<Proker> prokerList = new ArrayList<>();
+    private final List<Proker> prokerList = new ArrayList<>();
     // ------------------------------
 
     public Division(String divisionName) {

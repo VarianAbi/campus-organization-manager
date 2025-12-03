@@ -1,16 +1,16 @@
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\singleton\OrgManager.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\models\Proker.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\StaffMuda.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\gui\MainFrame.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\OfficeHolder.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\factory\MemberFactory.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\Member.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\database\DataStore.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\StaffAhli.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\gui\panels\ProkerPanel.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\Division.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\gui\panels\HomePanel.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\observer\NewsPublisher.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\gui\panels\AllMembersPanel.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\app\MainApp.java
-C:\Users\varia\Kuliah\SEMESTER 3\PEMROGRAMAN BERBASIS OBJEK\Tugas Besar\campus-organization-manager\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\OrgComponent.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\observer\NewsPublisher.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\gui\MainFrame.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\factory\MemberFactory.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\models\Proker.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\Member.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\OfficeHolder.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\gui\panels\AllMembersPanel.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\StaffAhli.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\app\MainApp.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\database\DataStore.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\gui\panels\HomePanel.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\singleton\OrgManager.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\OrgComponent.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\StaffMuda.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\gui\panels\ProkerPanel.java
+C:\Users\USER\OneDrive - Politeknik Negeri Bandung\TUBES PBO P SEMESTER 3\campus-organization-manager\src\main\java\com\campusorg\patterns\composite\Division.java

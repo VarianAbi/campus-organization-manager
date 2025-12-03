@@ -28,18 +28,18 @@ import com.campusorg.gui.panels.ProkerPanel;
 
 public class MainFrame extends JFrame {
 
-    private CardLayout cardLayout;
-    private JPanel contentPanel;
+    private final CardLayout cardLayout;
+    private final JPanel contentPanel;
     private JPanel sidebarPanel;
 
     // PANEL MODULAR (InputPanel SUDAH DIHAPUS)
-    private HomePanel homePanel;
-    private AllMembersPanel allMembersPanel;
-    private ProkerPanel prokerPanel;
+    private final HomePanel homePanel;
+    private final AllMembersPanel allMembersPanel;
+    private final ProkerPanel prokerPanel;
 
-    private final Color COL_SIDEBAR = new Color(33, 47, 60);
-    private final Color COL_ACTIVE = new Color(52, 73, 94);
-    private final Color COL_BG = new Color(244, 246, 247);
+    private static final Color COL_SIDEBAR = new Color(33, 47, 60);
+    private static final Color COL_ACTIVE = new Color(52, 73, 94);
+    private static final Color COL_BG = new Color(244, 246, 247);
 
     public MainFrame() {
         setTitle("HIMAKOM App (Final Version)");
@@ -128,10 +128,12 @@ public class MainFrame extends JFrame {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btn.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(COL_ACTIVE);
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(COL_SIDEBAR);
             }
@@ -161,7 +163,7 @@ public class MainFrame extends JFrame {
                 return new ImageIcon(scaledImage);
             }
             return null;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return null;
         }
     }

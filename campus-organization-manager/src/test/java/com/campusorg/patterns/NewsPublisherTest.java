@@ -1,11 +1,15 @@
 package com.campusorg.patterns;
 
-import com.campusorg.models.*;
-import com.campusorg.patterns.composite.*;
-import com.campusorg.patterns.observer.NewsPublisher;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import com.campusorg.patterns.composite.Member;
+import com.campusorg.patterns.composite.OfficeHolder;
+import com.campusorg.patterns.composite.StaffAhli;
+import com.campusorg.patterns.composite.StaffMuda;
+import com.campusorg.patterns.observer.NewsPublisher;
 
 /**
  * Unit test untuk Observer Pattern - NewsPublisher

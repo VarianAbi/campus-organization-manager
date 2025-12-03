@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Box;
@@ -33,16 +34,17 @@ import com.campusorg.patterns.factory.MemberFactory;
 import com.campusorg.patterns.singleton.OrgManager;
 
 public class AllMembersPanel extends JPanel {
-    private JTable table;
-    private DefaultTableModel model;
+    private final JTable table;
+    private final DefaultTableModel model;
     private JTextField searchField;
     private JComboBox<String> filterCombo;
-    private TableRowSorter<DefaultTableModel> sorter;
+    private final transient TableRowSorter<DefaultTableModel> sorter;
 
     // Constants untuk Input
-    private final String[] ROLES_BPH = { "Ketua Himpunan", "Wakil Ketua", "Sekretaris", "Bendahara" };
-    private final String[] ROLES_STD = { "Staff Muda", "Staff Ahli", "Ketua Departemen" };
+    private static final String[] ROLES_BPH = { "Ketua Himpunan", "Wakil Ketua", "Sekretaris", "Bendahara" };
+    private static final String[] ROLES_STD = { "Staff Muda", "Staff Ahli", "Ketua Departemen" };
 
+    @SuppressWarnings("CollectionsToArray")
     public AllMembersPanel() {
         setLayout(new BorderLayout(10, 10));
         setBackground(new Color(244, 246, 247));
@@ -65,8 +67,8 @@ public class AllMembersPanel extends JPanel {
         List<String> divs = new ArrayList<>();
         divs.add("Semua Divisi");
         for (String s : OrgManager.getInstance().getDivisionNames())
-            divs.add(s);
-        filterCombo = new JComboBox<>(divs.toArray(new String[0]));
+            Collections.addAll(divs, s);
+        filterCombo = new JComboBox<>(divs.toArray(new String[divs.size()]));
         filterCombo.setFont(new Font("Poppins", Font.PLAIN, 13));
 
         JButton btnFilter = new JButton("Terapkan Filter");
@@ -127,17 +129,15 @@ public class AllMembersPanel extends JPanel {
         refreshData();
     }
 
-    public void refreshData() {
+    public final void refreshData() {
         model.setRowCount(0);
         traverse(OrgManager.getInstance().getRoot());
     }
 
     private void traverse(OrgComponent comp) {
-        if (comp instanceof Division) {
-            Division d = (Division) comp;
+        if (comp instanceof Division d) {
             for (OrgComponent c : d.getMembers()) {
-                if (c instanceof Member) {
-                    Member m = (Member) c;
+                if (c instanceof Member m) {
                     model.addRow(new Object[] { m.getName(), d.getName(), m.getRole() });
                 } else
                     traverse(c);
@@ -222,5 +222,9 @@ public class AllMembersPanel extends JPanel {
 
         dialog.add(formPanel, BorderLayout.CENTER);
         dialog.setVisible(true);
+    }
+
+    public TableRowSorter<DefaultTableModel> getSorter() {
+        return sorter;
     }
 }

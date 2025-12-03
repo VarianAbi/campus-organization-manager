@@ -1,7 +1,7 @@
 package com.campusorg.patterns.composite;
 
 public class OfficeHolder extends Member {
-    private String jobTitle; // Contoh: "Ketua Himpunan", "Kepala MSDH", "Ketua Departemen"
+    private final String jobTitle; // Contoh: "Ketua Himpunan", "Kepala MSDH", "Ketua Departemen"
 
     public OfficeHolder(String name, String id, String jobTitle) {
         super(name, id);
