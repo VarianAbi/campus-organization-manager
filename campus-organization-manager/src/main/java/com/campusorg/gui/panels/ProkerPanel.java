@@ -93,13 +93,20 @@ public class ProkerPanel extends JPanel {
         title.setForeground(Color.BLACK);
         title.setForeground(Color.BLACK);
 
-        // Tombol Tambah Proker
+        // Tombol Tambah & Hapus Proker
         JButton btnAddProker = new JButton("➕ Tambah Proker");
-        btnAddProker.setBackground(new Color(241, 196, 15));
+        btnAddProker.setBackground(new Color(46, 204, 113));
         btnAddProker.setForeground(Color.BLACK);
         btnAddProker.setFont(new Font("Poppins", Font.BOLD, 13));
         btnAddProker.setFocusPainted(false);
         btnAddProker.addActionListener(e -> showInputProkerDialog());
+
+        JButton btnDeleteProker = new JButton("🗑️ Hapus Proker");
+        btnDeleteProker.setBackground(new Color(231, 76, 60));
+        btnDeleteProker.setForeground(Color.black);
+        btnDeleteProker.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnDeleteProker.setFocusPainted(false);
+        btnDeleteProker.addActionListener(e -> deleteSelectedProker());
 
         // Filter status
         statusFilter = new JComboBox<>(new String[] { "Semua Status", "Rencana", "Berjalan", "Selesai" });
@@ -133,6 +140,7 @@ public class ProkerPanel extends JPanel {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         btnPanel.setOpaque(false);
         btnPanel.add(btnAddProker);
+        btnPanel.add(btnDeleteProker);
         actionPanel.add(filterPnl, BorderLayout.WEST);
         actionPanel.add(btnPanel, BorderLayout.EAST);
 
@@ -208,14 +216,14 @@ public class ProkerPanel extends JPanel {
         btnEdit.setFont(new Font("Poppins", Font.BOLD, 13));
         btnEdit.setFocusPainted(false);
         btnEdit.setBorder(BorderFactory.createLineBorder(new Color(241, 196, 15), 2));
-        btnEdit.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur edit belum diimplementasikan."));
+        btnEdit.addActionListener(e -> editCurrentProker());
         JButton btnDelete = new JButton("🗑️ Hapus");
         btnDelete.setBackground(new Color(231, 76, 60));
-        btnDelete.setForeground(Color.BLACK);
+        btnDelete.setForeground(Color.black);
         btnDelete.setFont(new Font("Poppins", Font.BOLD, 13));
         btnDelete.setFocusPainted(false);
         btnDelete.setBorder(BorderFactory.createLineBorder(new Color(192, 57, 43), 2));
-        btnDelete.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur hapus belum diimplementasikan."));
+        btnDelete.addActionListener(e -> deleteCurrentProker());
         topBar.add(btnEdit);
         topBar.add(btnDelete);
 
@@ -497,6 +505,127 @@ public class ProkerPanel extends JPanel {
         formPanel.add(inpNama);
         formPanel.add(new JLabel("Divisi Penanggung Jawab:"));
         formPanel.add(inpDiv);
+        formPanel.add(new JLabel("Ketua Pelaksana:"));
+        formPanel.add(inpKetupel);
+        formPanel.add(new JLabel("Wakil Pelaksana:"));
+        formPanel.add(inpWaketupel);
+        formPanel.add(new JLabel("Deskripsi:"));
+        formPanel.add(new JScrollPane(inpDesc));
+        formPanel.add(btnSave);
+
+        dialog.add(formPanel, BorderLayout.CENTER);
+        dialog.setVisible(true);
+    }
+
+    // --- FITUR HAPUS PROKER DARI LIST ---
+    private void deleteSelectedProker() {
+        int row = table.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih program kerja yang ingin dihapus!", "Info", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Konversi index jika ada sorting
+        int modelRow = table.convertRowIndexToModel(row);
+        String prokerName = (String) model.getValueAt(modelRow, 0);
+        String divisi = (String) model.getValueAt(modelRow, 1);
+
+        // Konfirmasi hapus
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Apakah Anda yakin ingin menghapus program kerja:\n\"" + prokerName + "\"\nDari divisi: " + divisi,
+            "Konfirmasi Hapus",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            Division div = OrgManager.getInstance().getDivisionByName(divisi);
+            if (div != null) {
+                Proker target = null;
+                for (Proker p : div.getProkerList()) {
+                    if (p.getNamaProker().equals(prokerName)) {
+                        target = p;
+                        break;
+                    }
+                }
+
+                if (target != null) {
+                    div.getProkerList().remove(target);
+                    JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    refreshData(); // Refresh tabel
+                } else {
+                    JOptionPane.showMessageDialog(this, "Program kerja tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    // --- FITUR HAPUS PROKER DARI DETAIL VIEW ---
+    private void deleteCurrentProker() {
+        if (currentProker == null) return;
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Apakah Anda yakin ingin menghapus program kerja:\n\"" + currentProker.getNamaProker() + "\"?",
+            "Konfirmasi Hapus",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            String divisiName = currentProker.getParentDivisi();
+            Division div = OrgManager.getInstance().getDivisionByName(divisiName);
+            
+            if (div != null) {
+                div.getProkerList().remove(currentProker);
+                JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                showList(); // Kembali ke list view
+                refreshData();
+            }
+        }
+    }
+
+    // --- FITUR EDIT PROKER DARI DETAIL VIEW ---
+    private void editCurrentProker() {
+        if (currentProker == null) return;
+
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit Program Kerja", true);
+        dialog.setSize(450, 550);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel formPanel = new JPanel(new GridLayout(9, 1, 10, 10));
+        formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        formPanel.setBackground(Color.WHITE);
+
+        JTextField inpNama = new JTextField(currentProker.getNamaProker());
+        JComboBox<String> inpStatus = new JComboBox<>(new String[]{"Rencana", "Berjalan", "Selesai"});
+        inpStatus.setSelectedItem(currentProker.getStatus());
+        JTextField inpKetupel = new JTextField(currentProker.getKetupel());
+        JTextField inpWaketupel = new JTextField(currentProker.getWaketupel());
+        JTextArea inpDesc = new JTextArea(currentProker.getDeskripsiDivisi(), 5, 20);
+        inpDesc.setLineWrap(true);
+        inpDesc.setWrapStyleWord(true);
+
+        JButton btnSave = new JButton("💾 Simpan Perubahan");
+        btnSave.setBackground(new Color(46, 204, 113));
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnSave.setFocusPainted(false);
+
+        btnSave.addActionListener(e -> {
+            currentProker.setNamaProker(inpNama.getText());
+            currentProker.setStatus((String) inpStatus.getSelectedItem());
+            currentProker.setKetupel(inpKetupel.getText());
+            currentProker.setWaketupel(inpWaketupel.getText());
+            currentProker.setDeskripsiDivisi(inpDesc.getText());
+
+            JOptionPane.showMessageDialog(dialog, "Perubahan berhasil disimpan!");
+            dialog.dispose();
+            populateDetail(); // Refresh detail view
+            refreshData();
+        });
+
+        formPanel.add(new JLabel("Nama Proker:"));
+        formPanel.add(inpNama);
+        formPanel.add(new JLabel("Status:"));
+        formPanel.add(inpStatus);
         formPanel.add(new JLabel("Ketua Pelaksana:"));
         formPanel.add(inpKetupel);
         formPanel.add(new JLabel("Wakil Pelaksana:"));

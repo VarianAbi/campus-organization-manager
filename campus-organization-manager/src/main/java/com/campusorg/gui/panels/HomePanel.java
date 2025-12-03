@@ -224,15 +224,19 @@ public class HomePanel extends JPanel {
         memberActionPnl.setBackground(Color.WHITE);
         JButton btnBayarKas = new JButton("💰 Bayar Kas");
         JButton btnEditMember = new JButton("✏️ Edit Anggota");
+        JButton btnDeleteMember = new JButton("🗑️ Hapus Anggota");
         
         btnBayarKas.setBackground(new Color(46, 204, 113)); btnBayarKas.setForeground(Color.BLACK);
         btnEditMember.setBackground(new Color(241, 196, 15)); btnEditMember.setForeground(Color.BLACK);
+        btnDeleteMember.setBackground(new Color(231, 76, 60)); btnDeleteMember.setForeground(Color.black);
 
         btnBayarKas.addActionListener(e -> actionPayKas());
         btnEditMember.addActionListener(e -> actionEditMember()); 
+        btnDeleteMember.addActionListener(e -> actionDeleteMember());
 
         memberActionPnl.add(btnEditMember);
         memberActionPnl.add(btnBayarKas);
+        memberActionPnl.add(btnDeleteMember);
 
         return memberActionPnl;
     }
@@ -267,12 +271,22 @@ public class HomePanel extends JPanel {
         inputProkerPnl.add(inpProkerName, BorderLayout.CENTER);
         inputProkerPnl.add(btnAddProker, BorderLayout.EAST);
 
+        JPanel prokerActionPnl = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        prokerActionPnl.setBackground(Color.WHITE);
         JButton btnDetailProker = new JButton("Lihat Detail / Edit Proker");
+        JButton btnDeleteProker = new JButton("🗑️ Hapus Proker");
+        
         btnDetailProker.addActionListener(e -> actionEditProker());
+        btnDeleteProker.setBackground(new Color(231, 76, 60));
+        btnDeleteProker.setForeground(Color.black);
+        btnDeleteProker.addActionListener(e -> actionDeleteProker());
+        
+        prokerActionPnl.add(btnDetailProker);
+        prokerActionPnl.add(btnDeleteProker);
 
         prokerPanel.add(new JScrollPane(prokerTable), BorderLayout.CENTER);
         prokerPanel.add(inputProkerPnl, BorderLayout.NORTH);
-        prokerPanel.add(btnDetailProker, BorderLayout.SOUTH);
+        prokerPanel.add(prokerActionPnl, BorderLayout.SOUTH);
 
         return prokerPanel;
     }
@@ -572,6 +586,85 @@ public class HomePanel extends JPanel {
             div.addProker(newP);
             inpProkerName.setText("");
             openDivisionDetail(currentActiveDivision);
+        }
+    }
+
+    // --- FITUR HAPUS ANGGOTA ---
+    private void actionDeleteMember() {
+        int row = memberTable.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih anggota yang ingin dihapus!", "Info", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String name = (String) memberModel.getValueAt(row, 0);
+        String roleDisplay = (String) memberModel.getValueAt(row, 1);
+
+        // Cek apakah delegasi
+        if (roleDisplay.contains("Delegasi")) {
+            JOptionPane.showMessageDialog(this, "Anggota delegasi tidak bisa dihapus di sini.\nHapus di Biro asalnya.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Konfirmasi hapus
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Apakah Anda yakin ingin menghapus anggota:\n" + name + " (" + roleDisplay + ")?", 
+            "Konfirmasi Hapus", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            Division div = OrgManager.getInstance().getDivisionByName(currentActiveDivision);
+            Member target = findMemberRecursive(div, name);
+
+            if (target != null) {
+                div.removeMember(target);
+                JOptionPane.showMessageDialog(this, "Anggota berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                openDivisionDetail(currentActiveDivision); // Refresh
+            } else {
+                JOptionPane.showMessageDialog(this, "Anggota tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // --- FITUR HAPUS PROKER ---
+    private void actionDeleteProker() {
+        int row = prokerTable.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih program kerja yang ingin dihapus!", "Info", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String prokerName = (String) prokerModel.getValueAt(row, 0);
+
+        // Konfirmasi hapus
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Apakah Anda yakin ingin menghapus program kerja:\n\"" + prokerName + "\"?", 
+            "Konfirmasi Hapus", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            Division div = OrgManager.getInstance().getDivisionByName(currentActiveDivision);
+            
+            if (div != null) {
+                // Cari dan hapus proker
+                Proker targetProker = null;
+                for (Proker p : div.getProkerList()) {
+                    if (p.getNamaProker().equals(prokerName)) {
+                        targetProker = p;
+                        break;
+                    }
+                }
+
+                if (targetProker != null) {
+                    div.getProkerList().remove(targetProker);
+                    JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    openDivisionDetail(currentActiveDivision); // Refresh
+                } else {
+                    JOptionPane.showMessageDialog(this, "Program kerja tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }
 

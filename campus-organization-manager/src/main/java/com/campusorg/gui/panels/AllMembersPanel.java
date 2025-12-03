@@ -84,13 +84,20 @@ public class AllMembersPanel extends JPanel {
         filterPnl.add(filterCombo);
         filterPnl.add(btnFilter);
 
-        // --- TOMBOL TAMBAH ANGGOTA (POPUP) ---
+        // --- TOMBOL TAMBAH & HAPUS ANGGOTA ---
         JButton btnAdd = new JButton("➕ Tambah Anggota");
         btnAdd.setBackground(new Color(46, 204, 113)); // Hijau
         btnAdd.setForeground(Color.BLACK);
         btnAdd.setFont(new Font("Poppins", Font.BOLD, 12));
         btnAdd.setFocusPainted(false);
         btnAdd.addActionListener(e -> showInputMemberDialog()); // Panggil Popup
+
+        JButton btnDelete = new JButton("🗑️ Hapus Anggota");
+        btnDelete.setBackground(new Color(231, 76, 60)); // Merah
+        btnDelete.setForeground(Color.black);
+        btnDelete.setFont(new Font("Poppins", Font.BOLD, 12));
+        btnDelete.setFocusPainted(false);
+        btnDelete.addActionListener(e -> deleteSelectedMember());
 
         // Layout Header
         JPanel actionPanel = new JPanel(new BorderLayout());
@@ -99,6 +106,7 @@ public class AllMembersPanel extends JPanel {
         btnPanel.setOpaque(false);
         btnPanel.setFont(new Font("Poppins", Font.PLAIN, 12));
         btnPanel.add(btnAdd);
+        btnPanel.add(btnDelete);
         actionPanel.add(filterPnl, BorderLayout.WEST);
         actionPanel.add(btnPanel, BorderLayout.EAST);
 
@@ -223,6 +231,58 @@ public class AllMembersPanel extends JPanel {
 
         dialog.add(formPanel, BorderLayout.CENTER);
         dialog.setVisible(true);
+    }
+
+    // --- FITUR HAPUS ANGGOTA ---
+    private void deleteSelectedMember() {
+        int row = table.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih anggota yang ingin dihapus!", "Info", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Konversi index jika ada sorting
+        int modelRow = table.convertRowIndexToModel(row);
+        String name = (String) model.getValueAt(modelRow, 0);
+        String divisi = (String) model.getValueAt(modelRow, 1);
+        String jabatan = (String) model.getValueAt(modelRow, 2);
+
+        // Konfirmasi hapus
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Apakah Anda yakin ingin menghapus anggota:\n" + name + "\nDivisi: " + divisi + "\nJabatan: " + jabatan,
+            "Konfirmasi Hapus",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            Division div = OrgManager.getInstance().getDivisionByName(divisi);
+            if (div != null) {
+                Member target = findMemberInDivision(div, name);
+                if (target != null) {
+                    div.removeMember(target);
+                    JOptionPane.showMessageDialog(this, "Anggota berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    refreshData(); // Refresh tabel
+                } else {
+                    JOptionPane.showMessageDialog(this, "Anggota tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    // Helper method untuk mencari member di divisi
+    private Member findMemberInDivision(Division div, String targetName) {
+        for (OrgComponent comp : div.getMembers()) {
+            if (comp instanceof Member m) {
+                if (m.getName().equals(targetName)) {
+                    return m;
+                }
+            } else if (comp instanceof Division subDiv) {
+                // Rekursif untuk sub-divisi
+                Member found = findMemberInDivision(subDiv, targetName);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 
     public TableRowSorter<DefaultTableModel> getSorter() {
