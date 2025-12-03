@@ -7,92 +7,69 @@
       "type": "Division",
       "members": [
         {
-          "name": "Abbi",
+          "name": "Hisyam",
           "role": "Ketua Himpunan",
           "uangKas": 0,
           "perpanjangan": "-",
           "type": "OfficeHolder"
         }
       ],
-      "prokers": [
-        {
-          "namaProker": "HCW",
-          "deskripsi": "Terlaris",
-          "ketupel": "Hisyam",
-          "waketupel": "Terlarang",
-          "status": "Rencana",
-          "progress": 0,
-          "parentDivisi": "BPH Inti"
-        }
-      ]
+      "prokers": []
     },
     {
-      "name": "Lembaga Eksekutif",
+      "name": "Biro KESRA",
       "type": "Division",
       "members": [
         {
-          "name": "Birokrasi",
-          "type": "Division",
-          "members": [
-            {
-              "name": "Biro KESRA",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            },
-            {
-              "name": "Biro ADKES",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            }
-          ],
-          "prokers": []
-        },
-        {
-          "name": "Departemen",
-          "type": "Division",
-          "members": [
-            {
-              "name": "Dept. SENOR",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            },
-            {
-              "name": "Dept. ILPROF",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            },
-            {
-              "name": "Dept. KOMINFO",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            },
-            {
-              "name": "Dept. LUHIM",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            },
-            {
-              "name": "Dept. PSDA",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            },
-            {
-              "name": "Unit TEKNO",
-              "type": "Division",
-              "members": [],
-              "prokers": []
-            }
-          ],
-          "prokers": []
+          "name": "Hisyam",
+          "role": "Staff Muda",
+          "uangKas": 0,
+          "perpanjangan": "Dept. LUHIM",
+          "type": "StaffMuda"
         }
       ],
+      "prokers": []
+    },
+    {
+      "name": "Biro ADKES",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "Dept. SENOR",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "Dept. ILPROF",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "Dept. KOMINFO",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "Dept. LUHIM",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "Dept. PSDA",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "Unit TEKNO",
+      "type": "Division",
+      "members": [],
       "prokers": []
     },
     {
