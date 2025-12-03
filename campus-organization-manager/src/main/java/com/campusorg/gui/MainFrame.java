@@ -107,7 +107,7 @@ public class MainFrame extends JFrame {
 
         sidebarPanel.add(Box.createVerticalGlue());
 
-        JLabel credit = new JLabel("© 2024 Kelompok 2C", SwingConstants.CENTER);
+        JLabel credit = new JLabel("© 2025 Himakom App", SwingConstants.CENTER);
         credit.setFont(new Font("Poppins", Font.PLAIN, 11));
         credit.setForeground(Color.GRAY);
         credit.setAlignmentX(Component.CENTER_ALIGNMENT);
