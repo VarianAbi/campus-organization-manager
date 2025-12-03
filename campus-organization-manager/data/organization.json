@@ -1,0 +1,125 @@
+{
+  "name": "HIMAKOM (Pusat)",
+  "type": "Division",
+  "members": [
+    {
+      "name": "BPH Inti",
+      "type": "Division",
+      "members": [
+        {
+          "name": "Abbi",
+          "role": "Ketua Himpunan",
+          "uangKas": 0,
+          "perpanjangan": "-",
+          "type": "OfficeHolder"
+        }
+      ],
+      "prokers": [
+        {
+          "namaProker": "HCW",
+          "deskripsi": "Terlaris",
+          "ketupel": "Hisyam",
+          "waketupel": "Terlarang",
+          "status": "Rencana",
+          "progress": 0,
+          "parentDivisi": "BPH Inti"
+        }
+      ]
+    },
+    {
+      "name": "Lembaga Eksekutif",
+      "type": "Division",
+      "members": [
+        {
+          "name": "Birokrasi",
+          "type": "Division",
+          "members": [
+            {
+              "name": "Biro KESRA",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            },
+            {
+              "name": "Biro ADKES",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            }
+          ],
+          "prokers": []
+        },
+        {
+          "name": "Departemen",
+          "type": "Division",
+          "members": [
+            {
+              "name": "Dept. SENOR",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            },
+            {
+              "name": "Dept. ILPROF",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            },
+            {
+              "name": "Dept. KOMINFO",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            },
+            {
+              "name": "Dept. LUHIM",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            },
+            {
+              "name": "Dept. PSDA",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            },
+            {
+              "name": "Unit TEKNO",
+              "type": "Division",
+              "members": [],
+              "prokers": []
+            }
+          ],
+          "prokers": []
+        }
+      ],
+      "prokers": []
+    },
+    {
+      "name": "MPA",
+      "type": "Division",
+      "members": [],
+      "prokers": []
+    },
+    {
+      "name": "MSDH",
+      "type": "Division",
+      "members": [
+        {
+          "name": "Divisi Kaderisasi",
+          "type": "Division",
+          "members": [],
+          "prokers": []
+        },
+        {
+          "name": "Divisi Apresiasi \u0026 Evaluasi",
+          "type": "Division",
+          "members": [],
+          "prokers": []
+        }
+      ],
+      "prokers": []
+    }
+  ],
+  "prokers": []
+}

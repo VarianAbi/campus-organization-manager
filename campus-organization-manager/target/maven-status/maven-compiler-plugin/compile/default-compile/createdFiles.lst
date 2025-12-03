@@ -17,6 +17,7 @@ com\campusorg\database\DataStore.class
 com\campusorg\patterns\composite\OfficeHolder.class
 com\campusorg\patterns\composite\StaffMuda.class
 com\campusorg\gui\panels\ProkerPanel$2.class
+com\campusorg\app\MainApp$1.class
 com\campusorg\gui\panels\HomePanel$2.class
 com\campusorg\gui\panels\AllMembersPanel$1.class
 com\campusorg\gui\panels\HomePanel.class

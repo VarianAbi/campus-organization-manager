@@ -70,6 +70,7 @@ public class AllMembersPanel extends JPanel {
             Collections.addAll(divs, s);
         filterCombo = new JComboBox<>(divs.toArray(new String[divs.size()]));
         filterCombo.setFont(new Font("Poppins", Font.PLAIN, 13));
+        filterCombo.setForeground(Color.blue);
 
         JButton btnFilter = new JButton("Terapkan Filter");
         btnFilter.setBackground(new Color(52, 152, 219));
