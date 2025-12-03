@@ -1,40 +1,19 @@
 package com.campusorg.gui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
+import com.campusorg.models.*;
+import com.campusorg.patterns.MemberFactory; // Pastikan import ini ada
+import com.campusorg.services.OrgManager;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.net.URL;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
-
-import com.campusorg.models.Division;
-import com.campusorg.models.Member;
-import com.campusorg.models.OrgComponent;
-import com.campusorg.models.Proker;
-import com.campusorg.services.OrgManager;
 
 public class HomePanel extends JPanel {
 
@@ -49,10 +28,15 @@ public class HomePanel extends JPanel {
     // --- DETAIL VIEW COMPONENTS ---
     private JPanel detailDivPanel;
     private JLabel detailTitleLabel;
+    
+    // Member Table
     private JTable memberTable;
     private DefaultTableModel memberModel;
+    
+    // Proker Table
     private JTable prokerTable;
     private DefaultTableModel prokerModel;
+    private JTextField inpProkerName; // Quick Add
     
     // State
     private String currentActiveDivision;
@@ -67,10 +51,7 @@ public class HomePanel extends JPanel {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
         
-        // 1. Init Dashboard UI
         initDashboardUI();
-        
-        // 2. Init Detail UI
         initDetailUI();
 
         mainContainer.add(new JScrollPane(dashboardScrollContent), "DASHBOARD");
@@ -78,7 +59,6 @@ public class HomePanel extends JPanel {
 
         add(mainContainer, BorderLayout.CENTER);
         
-        // Load Data Awal
         refreshData();
     }
 
@@ -89,7 +69,7 @@ public class HomePanel extends JPanel {
         dashboardScrollContent.setBackground(COL_BG);
         dashboardScrollContent.setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        JLabel lblLead = new JLabel("Pimpinan Teras (BPH Inti)");
+        JLabel lblLead = new JLabel("Struktur Organisasi");
         lblLead.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblLead.setAlignmentX(Component.LEFT_ALIGNMENT);
         
@@ -132,36 +112,118 @@ public class HomePanel extends JPanel {
 
         // Split Pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setResizeWeight(0.6);
+        splitPane.setResizeWeight(0.65); // Kiri lebih lebar
         
-        // Kiri: Anggota
+        // --- PANEL KIRI: DAFTAR ANGGOTA ---
         JPanel memberPanel = new JPanel(new BorderLayout());
-        memberPanel.setBorder(BorderFactory.createTitledBorder("Daftar Anggota"));
+        memberPanel.setBorder(BorderFactory.createTitledBorder("Daftar Anggota & Keuangan"));
         memberPanel.setBackground(Color.WHITE);
-        String[] mCols = {"Nama Anggota", "Jabatan"};
-        memberModel = new DefaultTableModel(mCols, 0);
+        
+        // Kolom dipisah: Jabatan & Perpanjangan
+        String[] mCols = {"Nama", "Jabatan", "Perpanjangan", "Uang Kas"};
+        memberModel = new DefaultTableModel(mCols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) { return false; }
+        };
         memberTable = new JTable(memberModel);
-        memberTable.setRowHeight(25);
-        memberPanel.add(new JScrollPane(memberTable), BorderLayout.CENTER);
+        memberTable.setRowHeight(30);
+        
+        // Custom Renderer (Warna Perpanjangan)
+        memberTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                // Safety Check
+                if (row < 0 || row >= table.getRowCount()) {
+                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                }
 
-        // Kanan: Proker
-        JPanel prokerPanel = new JPanel(new BorderLayout());
-        prokerPanel.setBorder(BorderFactory.createTitledBorder("Program Kerja"));
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                try {
+                    String perpanjangan = (String) table.getValueAt(row, 2);
+                    if (column == 2) { 
+                        if (perpanjangan != null && perpanjangan.contains("ADKES")) c.setForeground(new Color(41, 128, 185));
+                        else if (perpanjangan != null && perpanjangan.contains("KESRA")) c.setForeground(new Color(230, 126, 34));
+                        else c.setForeground(Color.LIGHT_GRAY);
+                    } else {
+                        c.setForeground(Color.BLACK);
+                    }
+                } catch(Exception e) { c.setForeground(Color.BLACK); }
+                
+                if (isSelected) {
+                    c.setBackground(table.getSelectionBackground());
+                    c.setForeground(table.getSelectionForeground());
+                } else {
+                    c.setBackground(Color.WHITE);
+                }
+                return c;
+            }
+        });
+
+        // Tombol Aksi Anggota
+        JPanel memberActionPnl = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        memberActionPnl.setBackground(Color.WHITE);
+        JButton btnBayarKas = new JButton("💰 Bayar Kas");
+        JButton btnEditMember = new JButton("✏️ Edit Anggota");
+        
+        btnBayarKas.setBackground(new Color(46, 204, 113)); btnBayarKas.setForeground(Color.BLACK);
+        btnEditMember.setBackground(new Color(241, 196, 15)); btnEditMember.setForeground(Color.BLACK);
+
+        btnBayarKas.addActionListener(e -> actionPayKas());
+        btnEditMember.addActionListener(e -> actionEditMember()); 
+
+        memberActionPnl.add(btnEditMember);
+        memberActionPnl.add(btnBayarKas);
+
+        memberPanel.add(new JScrollPane(memberTable), BorderLayout.CENTER);
+        memberPanel.add(memberActionPnl, BorderLayout.SOUTH);
+
+        // --- PANEL KANAN: PROKER ---
+        JPanel prokerPanel = new JPanel(new BorderLayout(5, 5));
+        prokerPanel.setBorder(BorderFactory.createTitledBorder("Program Kerja (Klik 2x utk Detail)"));
         prokerPanel.setBackground(Color.WHITE);
+        
         String[] pCols = {"Nama Proker", "Status"};
-        prokerModel = new DefaultTableModel(pCols, 0);
+        prokerModel = new DefaultTableModel(pCols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) { return false; }
+        };
         prokerTable = new JTable(prokerModel);
         prokerTable.setRowHeight(25);
+        
+        // Listener Double Click Proker
+        prokerTable.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) actionEditProker();
+            }
+        });
+        
+        // Quick Add Proker
+        JPanel inputProkerPnl = new JPanel(new BorderLayout());
+        inputProkerPnl.setOpaque(false);
+        inpProkerName = new JTextField();
+        JButton btnAddProker = new JButton("Add");
+        btnAddProker.addActionListener(e -> actionAddProker());
+        
+        inputProkerPnl.add(new JLabel(" Nama: "), BorderLayout.WEST);
+        inputProkerPnl.add(inpProkerName, BorderLayout.CENTER);
+        inputProkerPnl.add(btnAddProker, BorderLayout.EAST);
+
+        // Tombol Detail/Edit
+        JButton btnDetailProker = new JButton("Lihat Detail / Edit Proker");
+        btnDetailProker.addActionListener(e -> actionEditProker());
+
         prokerPanel.add(new JScrollPane(prokerTable), BorderLayout.CENTER);
+        prokerPanel.add(inputProkerPnl, BorderLayout.NORTH);
+        prokerPanel.add(btnDetailProker, BorderLayout.SOUTH);
 
         splitPane.setLeftComponent(memberPanel);
         splitPane.setRightComponent(prokerPanel);
         detailDivPanel.add(splitPane, BorderLayout.CENTER);
     }
 
-    // ================== LOGIC ==================
+    // ================== LOGIC: DATA & ACTIONS ==================
+
     public void refreshData() {
-        // 1. Refresh BPH
         leadersContainer.removeAll();
         Division bph = OrgManager.getInstance().getDivisionByName("BPH Inti");
         if (bph != null && !bph.getMembers().isEmpty()) {
@@ -171,18 +233,13 @@ public class HomePanel extends JPanel {
                     leadersContainer.add(createLeaderCard(m.getName(), m.getRole()));
                 }
             }
-        } else {
-            leadersContainer.add(new JLabel("(Belum ada data Pimpinan Inti)"));
-        }
+        } else leadersContainer.add(new JLabel("(Belum ada data)"));
 
-        // 2. Refresh Grid
         divisionsGrid.removeAll();
-        String[] allDivs = OrgManager.getInstance().getDivisionNames();
-        for (String divName : allDivs) {
+        for (String divName : OrgManager.getInstance().getDivisionNames()) {
             if (divName.equals("BPH Inti") || divName.equals("Divisi Kaderisasi") || divName.equals("Divisi Apresiasi & Evaluasi")) continue; 
             divisionsGrid.add(createDivisionCard(divName));
         }
-        
         leadersContainer.revalidate(); leadersContainer.repaint();
         divisionsGrid.revalidate(); divisionsGrid.repaint();
     }
@@ -190,42 +247,241 @@ public class HomePanel extends JPanel {
     private void openDivisionDetail(String divName) {
         currentActiveDivision = divName;
         detailTitleLabel.setText(divName);
+        
+        // LOGIC KOLOM: Kalau Biro ada kolom perpanjangan, kalau Divisi Biasa tidak ada
+        boolean isBiro = divName.contains("Biro");
+        if (isBiro) {
+            String[] cols = {"Nama", "Jabatan", "Perpanjangan Ke", "Uang Kas"};
+            memberModel.setColumnIdentifiers(cols);
+        } else {
+            String[] cols = {"Nama", "Jabatan", "Uang Kas"};
+            memberModel.setColumnIdentifiers(cols);
+        }
+
         memberModel.setRowCount(0);
         prokerModel.setRowCount(0);
 
         Division div = OrgManager.getInstance().getDivisionByName(divName);
-        
-        // Load Members
-        if (divName.equals("MSDH") && div != null) {
-            loadRecursiveMember(div, "");
-        } else if (div != null) {
-            for (OrgComponent c : div.getMembers()) {
-                if (c instanceof Member) {
-                    Member m = (Member) c;
-                    memberModel.addRow(new Object[]{m.getName(), m.getRole()});
-                }
-            }
-        }
-
-        // Load Prokers
         if (div != null) {
+            // Load Members
+            loadRecursiveMember(div, isBiro);
+            
+            // Jika BUKAN Biro, cari orang delegasi yang masuk
+            if (!isBiro) {
+                findAndAddIncomingDelegations(divName);
+            }
+
+            // Load Prokers
             for (Proker p : div.getProkerList()) {
                 prokerModel.addRow(new Object[]{p.getNamaProker(), p.getStatus()});
             }
         }
-        
         cardLayout.show(mainContainer, "DETAIL");
     }
 
-    private void loadRecursiveMember(Division d, String suffix) {
+    private void loadRecursiveMember(Division d, boolean showPerpanjanganColumn) {
         for (OrgComponent c : d.getMembers()) {
             if (c instanceof Member) {
                 Member m = (Member) c;
-                memberModel.addRow(new Object[]{m.getName(), m.getRole() + suffix});
+                String kasText = "Rp " + NumberFormat.getNumberInstance(Locale.GERMANY).format(m.getUangKas());
+                
+                if (showPerpanjanganColumn) {
+                    memberModel.addRow(new Object[]{m.getName(), m.getRole(), m.getPerpanjangan(), kasText});
+                } else {
+                    memberModel.addRow(new Object[]{m.getName(), m.getRole(), kasText});
+                }
             } else if (c instanceof Division) {
-                loadRecursiveMember((Division) c, " [" + c.getName() + "]");
+                loadRecursiveMember((Division) c, showPerpanjanganColumn);
             }
         }
+    }
+
+    // Logic Delegasi: Cari anak biro yang ditugaskan ke divisi ini
+    private void findAndAddIncomingDelegations(String targetDivName) {
+        String[] sourceBiros = {"Biro ADKES", "Biro KESRA"};
+        for (String biroName : sourceBiros) {
+            Division biro = OrgManager.getInstance().getDivisionByName(biroName);
+            if (biro != null) {
+                for (OrgComponent c : biro.getMembers()) {
+                    if (c instanceof Member) {
+                        Member m = (Member) c;
+                        if (m.getPerpanjangan().equals(targetDivName)) {
+                            String roleDisplay = biroName.contains("ADKES") ? "Sekretaris (Delegasi ADKES)" : "Bendahara (Delegasi KESRA)";
+                            String kasText = "Rp " + NumberFormat.getNumberInstance(Locale.GERMANY).format(m.getUangKas());
+                            memberModel.addRow(new Object[]{m.getName(), roleDisplay, kasText});
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --- FITUR EDIT ANGGOTA (UPDATED DENGAN GANTI ROLE) ---
+    private void actionEditMember() {
+        int row = memberTable.getSelectedRow();
+        if (row == -1) { JOptionPane.showMessageDialog(this, "Pilih anggota dulu!"); return; }
+
+        String name = (String) memberModel.getValueAt(row, 0);
+        String roleDisplay = (String) memberModel.getValueAt(row, 1);
+
+        if (roleDisplay.contains("Delegasi")) {
+            JOptionPane.showMessageDialog(this, "Ini anggota delegasi. Edit di Biro asalnya.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        Division div = OrgManager.getInstance().getDivisionByName(currentActiveDivision);
+        Member target = findMemberRecursive(div, name);
+
+        if (target != null) {
+            JTextField txtName = new JTextField(target.getName());
+            
+            // Dropdown Jabatan (Role)
+            JComboBox<String> cmbRole = new JComboBox<>();
+            if (currentActiveDivision.equals("BPH Inti")) {
+                String[] roles = {"Ketua Himpunan", "Wakil Ketua Himpunan", "Sekretaris Jendral", "Sekretaris Umum", "Bendahara Umum"};
+                for (String r : roles) cmbRole.addItem(r);
+            } else {
+                String[] roles = {"Staff Muda", "Staff Ahli", "Ketua Departemen/Biro"};
+                for (String r : roles) cmbRole.addItem(r);
+            }
+            cmbRole.setSelectedItem(target.getRole());
+
+            // Dropdown Perpanjangan (Hanya aktif jika Biro)
+            boolean isBiro = currentActiveDivision.contains("Biro");
+            JComboBox<String> cmbPerpanjangan = new JComboBox<>();
+            JComponent perpanjanganInput;
+            
+            if (isBiro) {
+                cmbPerpanjangan.addItem("-");
+                for (String dName : OrgManager.getInstance().getDivisionNames()) {
+                    if (!dName.equals(currentActiveDivision) && !dName.equals("BPH Inti") && !dName.equals("MSDH")) {
+                        cmbPerpanjangan.addItem(dName);
+                    }
+                }
+                cmbPerpanjangan.setSelectedItem(target.getPerpanjangan());
+                perpanjanganInput = cmbPerpanjangan;
+            } else {
+                perpanjanganInput = new JLabel("(Tidak tersedia)");
+            }
+
+            Object[] message = { "Nama Anggota:", txtName, "Jabatan:", cmbRole, "Perpanjangan Ke:", perpanjanganInput };
+
+            int option = JOptionPane.showConfirmDialog(this, message, "Edit Anggota", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                target.setName(txtName.getText());
+                
+                // RECREATE LOGIC FOR ROLE CHANGE
+                String newRole = (String) cmbRole.getSelectedItem();
+                if (!newRole.equals(target.getRole())) {
+                    String oldId = "ID-" + System.currentTimeMillis(); 
+                    int oldKas = target.getUangKas();
+                    String oldPerpanjangan = target.getPerpanjangan();
+                    
+                    String typeForFactory = newRole.contains("Staff") ? newRole : "Pejabat Struktural";
+                    String titleForFactory = newRole.contains("Staff") ? "" : newRole;
+                    
+                    Member newMember = MemberFactory.createMember(typeForFactory, titleForFactory, txtName.getText(), oldId);
+                    
+                    newMember.bayarKas(oldKas); 
+                    div.removeMember(target);
+                    div.addMember(newMember);
+                    
+                    target = newMember; // Pointer pindah ke object baru
+                }
+
+                if (isBiro) target.setPerpanjangan((String) cmbPerpanjangan.getSelectedItem());
+                openDivisionDetail(currentActiveDivision); 
+            }
+        }
+    }
+
+    // --- FITUR EDIT PROKER ---
+    private void actionEditProker() {
+        int row = prokerTable.getSelectedRow();
+        if (row == -1) { JOptionPane.showMessageDialog(this, "Pilih proker dulu!"); return; }
+
+        String pName = (String) prokerModel.getValueAt(row, 0);
+        Division div = OrgManager.getInstance().getDivisionByName(currentActiveDivision);
+        Proker target = null;
+        for(Proker p : div.getProkerList()) { if(p.getNamaProker().equals(pName)) { target = p; break; } }
+
+        if (target != null) {
+            JTextField txtNama = new JTextField(target.getNamaProker());
+            JTextField txtKetupel = new JTextField(target.getKetupel());
+            JTextField txtWaketupel = new JTextField(target.getWaketupel());
+            String[] stats = {"Rencana", "Berjalan", "Selesai"};
+            JComboBox<String> cmbStatus = new JComboBox<>(stats);
+            cmbStatus.setSelectedItem(target.getStatus());
+            JTextArea txtDesc = new JTextArea(target.getDeskripsiDivisi(), 5, 20);
+
+            Object[] message = {
+                "Nama Proker:", txtNama, "Status:", cmbStatus, "Ketua Pelaksana:", txtKetupel,
+                "Wakil Ketuplak:", txtWaketupel, "Deskripsi:", new JScrollPane(txtDesc)
+            };
+
+            if (JOptionPane.showConfirmDialog(this, message, "Edit Proker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                target.setNamaProker(txtNama.getText());
+                target.setStatus((String) cmbStatus.getSelectedItem());
+                target.setKetupel(txtKetupel.getText());
+                target.setWaketupel(txtWaketupel.getText());
+                target.setDeskripsiDivisi(txtDesc.getText());
+                openDivisionDetail(currentActiveDivision);
+            }
+        }
+    }
+
+    private void actionPayKas() {
+        int row = memberTable.getSelectedRow();
+        if (row == -1) return;
+        String name = (String) memberModel.getValueAt(row, 0);
+        Division div = OrgManager.getInstance().getDivisionByName(currentActiveDivision);
+        Member target = findMemberRecursive(div, name);
+        if (target == null) { // Cari di biro lain kalau delegasi
+            target = findMemberRecursive(OrgManager.getInstance().getDivisionByName("Biro ADKES"), name);
+            if (target == null) target = findMemberRecursive(OrgManager.getInstance().getDivisionByName("Biro KESRA"), name);
+        }
+        if (target != null) {
+            String input = JOptionPane.showInputDialog(this, "Bayar Kas:", "10000");
+            if (input != null) {
+                try { target.bayarKas(Integer.parseInt(input)); openDivisionDetail(currentActiveDivision); } catch(Exception e){}
+            }
+        }
+    }
+
+    private void actionAddProker() {
+        String pName = inpProkerName.getText();
+        if (pName.isEmpty()) return;
+        
+        Division div = OrgManager.getInstance().getDivisionByName(currentActiveDivision);
+        if (div != null) {
+            // PERBAIKAN DISINI: Menyesuaikan dengan Konstruktor Proker yang baru
+            // Urutan: Nama, Deskripsi, Ketupel, Waketupel, Status, Progress, Divisi
+            Proker newP = new Proker(
+                pName,       // Nama
+                "-",         // Deskripsi (Default)
+                "-",         // Ketupel (Default)
+                "-",         // Waketupel (Default)
+                "Rencana",   // Status (Default)
+                0,           // Progress (Default)
+                currentActiveDivision // Divisi Asal
+            );
+            
+            div.addProker(newP);
+            inpProkerName.setText("");
+            openDivisionDetail(currentActiveDivision);
+        }
+    }
+
+    private Member findMemberRecursive(OrgComponent comp, String targetName) {
+        if (comp instanceof Member) {
+            if (comp.getName().equals(targetName)) return (Member) comp;
+        } else if (comp instanceof Division) {
+            for (OrgComponent c : ((Division) comp).getMembers()) {
+                Member res = findMemberRecursive(c, targetName);
+                if (res != null) return res;
+            }
+        }
+        return null;
     }
 
     // ================== FACTORIES ==================
@@ -234,7 +490,8 @@ public class HomePanel extends JPanel {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBackground(Color.WHITE);
         p.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(new Color(220, 220, 220), 1), new EmptyBorder(10, 15, 10, 15)));
+            BorderFactory.createLineBorder(new Color(220, 220, 220), 1), 
+            new EmptyBorder(10, 15, 10, 15)));
         JLabel n = new JLabel(name); n.setFont(new Font("Segoe UI", Font.BOLD, 14)); n.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel r = new JLabel(role); r.setFont(new Font("Segoe UI", Font.PLAIN, 12)); r.setForeground(Color.GRAY); r.setAlignmentX(Component.CENTER_ALIGNMENT);
         p.add(n); p.add(r); return p;
@@ -245,16 +502,15 @@ public class HomePanel extends JPanel {
         p.setBackground(Color.WHITE);
         p.setCursor(new Cursor(Cursor.HAND_CURSOR));
         p.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(new Color(200, 200, 200), 1), new EmptyBorder(15, 15, 15, 15)));
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1), 
+            new EmptyBorder(15, 15, 15, 15)));
         JLabel lbl = new JLabel(divName, SwingConstants.CENTER);
         lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lbl.setForeground(COL_SIDEBAR);
-        
         JLabel iconLabel = new JLabel("", SwingConstants.CENTER);
         ImageIcon icon = loadIcon(getIconFilename(divName), 50, 50);
         if (icon != null) iconLabel.setIcon(icon);
         else { iconLabel.setText("📂"); iconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 30)); }
-
         p.add(iconLabel, BorderLayout.CENTER);
         p.add(lbl, BorderLayout.SOUTH);
         p.addMouseListener(new MouseAdapter() {
@@ -265,17 +521,13 @@ public class HomePanel extends JPanel {
         return p;
     }
 
-    private String getIconFilename(String divName) {
-        return divName.toLowerCase().replace(".", "").replace(" ", "_") + ".png";
-    }
-
+    private String getIconFilename(String divName) { return divName.toLowerCase().replace(".", "").replace(" ", "_") + ".png"; }
     private ImageIcon loadIcon(String filename, int width, int height) {
         try {
             URL imgURL = getClass().getResource("/images/" + filename);
             if (imgURL != null) {
                 ImageIcon originalIcon = new ImageIcon(imgURL);
-                Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                return new ImageIcon(scaledImage);
+                return new ImageIcon(originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
             }
             return null;
         } catch (Exception e) { return null; }
