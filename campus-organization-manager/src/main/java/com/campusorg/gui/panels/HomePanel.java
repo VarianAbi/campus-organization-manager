@@ -43,6 +43,7 @@ import com.campusorg.patterns.composite.Member;
 import com.campusorg.patterns.composite.OrgComponent;
 import com.campusorg.patterns.factory.MemberFactory;
 import com.campusorg.patterns.singleton.OrgManager;
+import com.campusorg.utils.Constants;
 
 public class HomePanel extends JPanel {
 
@@ -99,7 +100,7 @@ public class HomePanel extends JPanel {
         dashboardScrollContent.setBorder(new EmptyBorder(20, 30, 20, 30));
 
         JLabel lblLead = new JLabel("Struktur Organisasi");
-        lblLead.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblLead.setFont(new Font(Constants.FONT_SEGOE_UI, Font.BOLD, 18));
         lblLead.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         leadersContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
@@ -132,7 +133,7 @@ public class HomePanel extends JPanel {
         backBtn.addActionListener(e -> cardLayout.show(mainContainer, "DASHBOARD"));
         
         detailTitleLabel = new JLabel("Nama Divisi", SwingConstants.CENTER);
-        detailTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        detailTitleLabel.setFont(new Font(Constants.FONT_SEGOE_UI, Font.BOLD, 28));
         detailTitleLabel.setForeground(COL_ACCENT);
 
         header.add(backBtn, BorderLayout.WEST);
@@ -153,7 +154,7 @@ public class HomePanel extends JPanel {
         memberPanel.setBorder(BorderFactory.createTitledBorder("Daftar Anggota & Keuangan"));
         memberPanel.setBackground(Color.WHITE);
 
-        String[] mCols = {"Nama", "Jabatan", "Perpanjangan", "Uang Kas"};
+        String[] mCols = {"Nama", Constants.COL_JABATAN, Constants.COL_PERPANJANGAN, Constants.COL_UANG_KAS};
         memberModel = new DefaultTableModel(mCols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) { return false; }
@@ -295,7 +296,7 @@ public class HomePanel extends JPanel {
 
     public final void refreshData() {
         leadersContainer.removeAll();
-        Division bph = OrgManager.getInstance().getDivisionByName("BPH Inti");
+        Division bph = OrgManager.getInstance().getDivisionByName(Constants.DIV_BPH_INTI);
         if (bph != null && !bph.getMembers().isEmpty()) {
             for (OrgComponent comp : bph.getMembers()) {
                 if (comp instanceof Member m) {
@@ -306,7 +307,7 @@ public class HomePanel extends JPanel {
 
         divisionsGrid.removeAll();
         for (String divName : OrgManager.getInstance().getDivisionNames()) {
-            if (divName.equals("BPH Inti") || divName.equals("Divisi Kaderisasi") || divName.equals("Divisi Apresiasi & Evaluasi")) continue; 
+            if (divName.equals(Constants.DIV_BPH_INTI) || divName.equals("Divisi Kaderisasi") || divName.equals("Divisi Apresiasi & Evaluasi")) continue; 
             divisionsGrid.add(createDivisionCard(divName));
         }
         leadersContainer.revalidate(); leadersContainer.repaint();
@@ -319,13 +320,8 @@ public class HomePanel extends JPanel {
         
         // LOGIC KOLOM: Kalau Biro ada kolom perpanjangan, kalau Divisi Biasa tidak ada
         boolean isBiro = divName.contains("Biro");
-        if (isBiro) {
-            String[] cols = {"Nama", "Jabatan", "Perpanjangan Ke", "Uang Kas"};
-            memberModel.setColumnIdentifiers(cols);
-        } else {
-            String[] cols = {"Nama", "Jabatan", "Uang Kas"};
-            memberModel.setColumnIdentifiers(cols);
-        }
+            if (isBiro) memberModel.setColumnIdentifiers(new String[]{"Nama", "Jabatan", "Perpanjangan Ke", "Uang Kas"});
+            else memberModel.setColumnIdentifiers(new String[]{"Nama", "Jabatan", "Uang Kas"});
 
         memberModel.setRowCount(0);
         prokerModel.setRowCount(0);
@@ -339,7 +335,6 @@ public class HomePanel extends JPanel {
             if (!isBiro) {
                 findAndAddIncomingDelegations(divName);
             }
-
             // Load Prokers
             for (Proker p : div.getProkerList()) {
                 prokerModel.addRow(new Object[]{p.getNamaProker(), p.getStatus()});
@@ -459,7 +454,7 @@ public class HomePanel extends JPanel {
 
     private JComboBox<String> createRoleComboBox(String selectedRole) {
         JComboBox<String> cmbRole = new JComboBox<>();
-        if (currentActiveDivision.equals("BPH Inti")) {
+        if (currentActiveDivision.equals(Constants.DIV_BPH_INTI)) {
             String[] roles = {"Ketua Himpunan", "Wakil Ketua Himpunan", "Sekretaris Jendral", "Sekretaris Umum", "Bendahara Umum"};
             for (String r : roles) cmbRole.addItem(r);
         } else {
@@ -475,7 +470,7 @@ public class HomePanel extends JPanel {
             JComboBox<String> cmbPerpanjangan = new JComboBox<>();
             cmbPerpanjangan.addItem("-");
             for (String dName : OrgManager.getInstance().getDivisionNames()) {
-                if (!dName.equals(currentActiveDivision) && !dName.equals("BPH Inti") && !dName.equals("MSDH")) {
+                if (!dName.equals(currentActiveDivision) && !dName.equals(Constants.DIV_BPH_INTI) && !dName.equals("MSDH")) {
                     cmbPerpanjangan.addItem(dName);
                 }
             }
@@ -691,8 +686,8 @@ public class HomePanel extends JPanel {
         p.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(220, 220, 220), 1), 
             new EmptyBorder(10, 15, 10, 15)));
-        JLabel n = new JLabel(name); n.setFont(new Font("Segoe UI", Font.BOLD, 14)); n.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel r = new JLabel(role); r.setFont(new Font("Segoe UI", Font.PLAIN, 12)); r.setForeground(Color.GRAY); r.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel n = new JLabel(name); n.setFont(new Font(Constants.FONT_SEGOE_UI, Font.BOLD, 14)); n.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel r = new JLabel(role); r.setFont(new Font(Constants.FONT_SEGOE_UI, Font.PLAIN, 12)); r.setForeground(Color.GRAY); r.setAlignmentX(Component.CENTER_ALIGNMENT);
         p.add(n); p.add(r); return p;
     }
 
@@ -709,7 +704,7 @@ public class HomePanel extends JPanel {
         JLabel iconLabel = new JLabel("", SwingConstants.CENTER);
         ImageIcon icon = loadIcon(getIconFilename(divName), 50, 50);
         if (icon != null) iconLabel.setIcon(icon);
-        else { iconLabel.setText("📂"); iconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 30)); }
+        else { iconLabel.setText("📂"); iconLabel.setFont(new Font(Constants.FONT_SEGOE_UI, Font.PLAIN, 30)); }
         p.add(iconLabel, BorderLayout.CENTER);
         p.add(lbl, BorderLayout.SOUTH);
         p.addMouseListener(new MouseAdapter() {

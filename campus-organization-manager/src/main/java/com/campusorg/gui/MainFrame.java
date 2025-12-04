@@ -25,6 +25,7 @@ import javax.swing.border.EmptyBorder;
 import com.campusorg.gui.panels.AllMembersPanel;
 import com.campusorg.gui.panels.HomePanel;
 import com.campusorg.gui.panels.ProkerPanel;
+import com.campusorg.utils.Constants;
 
 public class MainFrame extends JFrame {
 
@@ -59,9 +60,9 @@ public class MainFrame extends JFrame {
         prokerPanel = new ProkerPanel();
 
         // 3. Add Panels
-        contentPanel.add(homePanel, "HOME");
-        contentPanel.add(allMembersPanel, "DATA");
-        contentPanel.add(prokerPanel, "PROKER");
+        contentPanel.add(homePanel, Constants.CARD_HOME);
+        contentPanel.add(allMembersPanel, Constants.CARD_MEMBERS);
+        contentPanel.add(prokerPanel, Constants.CARD_PROKER);
 
         // 4. Sidebar
         initSidebar();
@@ -101,14 +102,14 @@ public class MainFrame extends JFrame {
         sidebarPanel.add(logoPnl);
 
         // --- MENU BUTTONS ---
-        addSidebarBtn("🏠  Home Dashboard", "HOME");
-        addSidebarBtn("👥  Data Anggota", "DATA");
-        addSidebarBtn("📅  Program Kerja", "PROKER");
+        addSidebarBtn("🏠  Home Dashboard", Constants.CARD_HOME);
+        addSidebarBtn("👥  Data Anggota", Constants.CARD_MEMBERS);
+        addSidebarBtn("📅  Program Kerja", Constants.CARD_PROKER);
 
         sidebarPanel.add(Box.createVerticalGlue());
 
         JLabel credit = new JLabel("© 2025 Himakom App", SwingConstants.CENTER);
-        credit.setFont(new Font("Poppins", Font.PLAIN, 11));
+        credit.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 11));
         credit.setForeground(Color.GRAY);
         credit.setAlignmentX(Component.CENTER_ALIGNMENT);
         sidebarPanel.add(credit);
@@ -123,7 +124,7 @@ public class MainFrame extends JFrame {
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
-        btn.setFont(new Font("Poppins", Font.PLAIN, 14));
+        btn.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 14));
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -140,11 +141,11 @@ public class MainFrame extends JFrame {
         });
 
         btn.addActionListener(e -> {
-            if (targetCard.equals("HOME"))
+            if (targetCard.equals(Constants.CARD_HOME))
                 homePanel.refreshData();
-            if (targetCard.equals("DATA"))
+            if (targetCard.equals(Constants.CARD_MEMBERS))
                 allMembersPanel.refreshData();
-            if (targetCard.equals("PROKER"))
+            if (targetCard.equals(Constants.CARD_PROKER))
                 prokerPanel.refreshData();
 
             cardLayout.show(contentPanel, targetCard);

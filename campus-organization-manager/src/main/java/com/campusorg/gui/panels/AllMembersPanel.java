@@ -32,6 +32,7 @@ import com.campusorg.patterns.composite.Member;
 import com.campusorg.patterns.composite.OrgComponent;
 import com.campusorg.patterns.factory.MemberFactory;
 import com.campusorg.patterns.singleton.OrgManager;
+import com.campusorg.utils.Constants;
 
 public class AllMembersPanel extends JPanel {
     private final JTable table;
@@ -63,19 +64,19 @@ public class AllMembersPanel extends JPanel {
         filterPnl.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 
         searchField = new JTextField(15);
-        searchField.setFont(new Font("Poppins", Font.PLAIN, 13));
+        searchField.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         List<String> divs = new ArrayList<>();
         divs.add("Semua Divisi");
         for (String s : OrgManager.getInstance().getDivisionNames())
             Collections.addAll(divs, s);
         filterCombo = new JComboBox<>(divs.toArray(new String[divs.size()]));
-        filterCombo.setFont(new Font("Poppins", Font.PLAIN, 13));
+        filterCombo.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         filterCombo.setForeground(Color.blue);
 
         JButton btnFilter = new JButton("Terapkan Filter");
         btnFilter.setBackground(new Color(52, 152, 219));
         btnFilter.setForeground(Color.black);
-        btnFilter.setFont(new Font("Poppins", Font.BOLD, 12));
+        btnFilter.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 12));
         btnFilter.addActionListener(e -> doFilter());
 
         filterPnl.add(new JLabel("🔍 Cari:"));
@@ -88,14 +89,14 @@ public class AllMembersPanel extends JPanel {
         JButton btnAdd = new JButton("➕ Tambah Anggota");
         btnAdd.setBackground(new Color(46, 204, 113)); // Hijau
         btnAdd.setForeground(Color.BLACK);
-        btnAdd.setFont(new Font("Poppins", Font.BOLD, 12));
+        btnAdd.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 12));
         btnAdd.setFocusPainted(false);
         btnAdd.addActionListener(e -> showInputMemberDialog()); // Panggil Popup
 
         JButton btnDelete = new JButton("🗑️ Hapus Anggota");
         btnDelete.setBackground(new Color(231, 76, 60)); // Merah
         btnDelete.setForeground(Color.black);
-        btnDelete.setFont(new Font("Poppins", Font.BOLD, 12));
+        btnDelete.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 12));
         btnDelete.setFocusPainted(false);
         btnDelete.addActionListener(e -> deleteSelectedMember());
 
@@ -104,7 +105,7 @@ public class AllMembersPanel extends JPanel {
         actionPanel.setOpaque(false);
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         btnPanel.setOpaque(false);
-        btnPanel.setFont(new Font("Poppins", Font.PLAIN, 12));
+        btnPanel.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 12));
         btnPanel.add(btnAdd);
         btnPanel.add(btnDelete);
         actionPanel.add(filterPnl, BorderLayout.WEST);
@@ -123,7 +124,7 @@ public class AllMembersPanel extends JPanel {
         };
         table = new JTable(model);
         table.setRowHeight(25);
-        table.setFont(new Font("Poppins", Font.PLAIN, 14));
+        table.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Inria Sans", Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(33, 47, 60));
         table.getTableHeader().setForeground(Color.BLACK);
@@ -160,7 +161,7 @@ public class AllMembersPanel extends JPanel {
         List<RowFilter<Object, Object>> filters = new ArrayList<>();
         if (!text.isEmpty())
             filters.add(RowFilter.regexFilter("(?i)" + text, 0));
-        if (!div.equals("Semua Divisi"))
+        if (!div.equals(Constants.STATUS_SEMUA))
             filters.add(RowFilter.regexFilter("(?i)" + div, 1));
         sorter.setRowFilter(RowFilter.andFilter(filters));
     }
@@ -174,19 +175,19 @@ public class AllMembersPanel extends JPanel {
 
         JPanel formPanel = new JPanel(new GridLayout(0, 1, 10, 10));
         formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        formPanel.setFont(new Font("Poppins", Font.PLAIN, 12));
+        formPanel.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 12));
 
         JTextField inpName = new JTextField();
-        inpName.setFont(new Font("Poppins", Font.PLAIN, 13));
+        inpName.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         JComboBox<String> inpDiv = new JComboBox<>(OrgManager.getInstance().getDivisionNames());
-        inpDiv.setFont(new Font("Poppins", Font.PLAIN, 13));
+        inpDiv.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         JComboBox<String> inpRole = new JComboBox<>();
 
         // Logic Dropdown Dinamis
         inpDiv.addActionListener(e -> {
             String selected = (String) inpDiv.getSelectedItem();
             inpRole.removeAllItems();
-            String[] roles = "BPH Inti".equals(selected) ? ROLES_BPH : ROLES_STD;
+            String[] roles = Constants.DIV_BPH_INTI.equals(selected) ? ROLES_BPH : ROLES_STD;
             for (String r : roles)
                 inpRole.addItem(r);
         });
@@ -197,7 +198,7 @@ public class AllMembersPanel extends JPanel {
         JButton btnSave = new JButton("SIMPAN");
         btnSave.setBackground(new Color(46, 204, 113));
         btnSave.setForeground(Color.black);
-        btnSave.setFont(new Font("Poppins", Font.BOLD, 12));
+        btnSave.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 12));
 
         btnSave.addActionListener(e -> {
             String nm = inpName.getText();
@@ -272,14 +273,15 @@ public class AllMembersPanel extends JPanel {
     // Helper method untuk mencari member di divisi
     private Member findMemberInDivision(Division div, String targetName) {
         for (OrgComponent comp : div.getMembers()) {
-            if (comp instanceof Member m) {
-                if (m.getName().equals(targetName)) {
+            switch (comp) {
+                case Member m when m.getName().equals(targetName) -> {
                     return m;
                 }
-            } else if (comp instanceof Division subDiv) {
-                // Rekursif untuk sub-divisi
-                Member found = findMemberInDivision(subDiv, targetName);
-                if (found != null) return found;
+                case Division subDiv -> {
+                    Member found = findMemberInDivision(subDiv, targetName);
+                    if (found != null) return found;
+                }
+                default -> { /* non-member components ignored */ }
             }
         }
         return null;

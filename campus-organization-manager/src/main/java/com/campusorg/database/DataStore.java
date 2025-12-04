@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.campusorg.models.Proker;
 import com.campusorg.patterns.composite.Division;
@@ -14,6 +16,7 @@ import com.campusorg.patterns.composite.OfficeHolder;
 import com.campusorg.patterns.composite.OrgComponent;
 import com.campusorg.patterns.composite.StaffAhli;
 import com.campusorg.patterns.composite.StaffMuda;
+import com.campusorg.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -42,6 +45,9 @@ public class DataStore {
     private static final String DATA_DIR = "data";
     private static final String DATA_FILE = "data/organization.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger LOGGER = Logger.getLogger(DataStore.class.getName());
+
+    private DataStore() {}
 
     // ==================== SAVE DATA ====================
     /**
@@ -60,12 +66,11 @@ public class DataStore {
             // Tulis ke file
             try (FileWriter writer = new FileWriter(DATA_FILE)) {
                 gson.toJson(rootJson, writer);
-                System.out.println("✅ Data berhasil disimpan ke: " + DATA_FILE);
+                LOGGER.info("Data berhasil disimpan ke: " + DATA_FILE);
             }
 
         } catch (IOException e) {
-            System.err.println("❌ Error menyimpan data: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error menyimpan data", e);
         }
     }
 
@@ -80,7 +85,7 @@ public class DataStore {
 
         // Kalau file tidak ada, return null (pakai data default)
         if (!file.exists()) {
-            System.out.println("ℹ️ File data tidak ditemukan. Menggunakan data default.");
+            LOGGER.info("File data tidak ditemukan. Menggunakan data default.");
             return null;
         }
 
@@ -88,12 +93,11 @@ public class DataStore {
             JsonObject rootJson = gson.fromJson(reader, JsonObject.class);
             Division rootOrg = jsonToDivision(rootJson);
 
-            System.out.println("✅ Data berhasil dimuat dari: " + DATA_FILE);
+            LOGGER.info("Data berhasil dimuat dari: " + DATA_FILE);
             return rootOrg;
 
         } catch (IOException e) {
-            System.err.println("❌ Error membaca data: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error membaca data", e);
             return null;
         }
     }
@@ -107,21 +111,22 @@ public class DataStore {
         // Array members
         JsonArray membersArray = new JsonArray();
         for (OrgComponent comp : div.getMembers()) {
-            if (comp instanceof Division) {
-                // Rekursif untuk sub-divisi
-                membersArray.add(divisionToJson((Division) comp));
-            } else if (comp instanceof Member) {
-                membersArray.add(memberToJson((Member) comp));
+            switch (comp) {
+                case Division division -> membersArray.add(divisionToJson(division));
+                case Member member -> membersArray.add(memberToJson(member));
+                default -> {
+                    // ignore other types
+                }
             }
         }
-        json.add("members", membersArray);
+        json.add(Constants.JSON_MEMBERS, membersArray);
 
         // Array prokers
         JsonArray prokersArray = new JsonArray();
         for (Proker p : div.getProkerList()) {
             prokersArray.add(prokerToJson(p));
         }
-        json.add("prokers", prokersArray);
+        json.add(Constants.JSON_PROKERS, prokersArray);
 
         return json;
     }
@@ -131,8 +136,8 @@ public class DataStore {
         JsonObject json = new JsonObject();
         json.addProperty("name", member.getName());
         json.addProperty("role", member.getRole());
-        json.addProperty("uangKas", member.getUangKas());
-        json.addProperty("perpanjangan", member.getPerpanjangan());
+        json.addProperty(Constants.JSON_UANG_KAS, member.getUangKas());
+        json.addProperty(Constants.JSON_PERPANJANGAN, member.getPerpanjangan());
 
         // Tentukan tipe member
         if (member instanceof StaffMuda) {
@@ -152,12 +157,12 @@ public class DataStore {
     private static JsonObject prokerToJson(Proker proker) {
         JsonObject json = new JsonObject();
         json.addProperty("namaProker", proker.getNamaProker());
-        json.addProperty("deskripsi", proker.getDeskripsiDivisi());
-        json.addProperty("ketupel", proker.getKetupel());
-        json.addProperty("waketupel", proker.getWaketupel());
-        json.addProperty("status", proker.getStatus());
-        json.addProperty("progress", proker.getProgress());
-        json.addProperty("parentDivisi", proker.getParentDivisi());
+        json.addProperty(Constants.JSON_DESKRIPSI, proker.getDeskripsiDivisi());
+        json.addProperty(Constants.JSON_KETUPEL, proker.getKetupel());
+        json.addProperty(Constants.JSON_WAKETUPEL, proker.getWaketupel());
+        json.addProperty(Constants.JSON_STATUS, proker.getStatus());
+        json.addProperty(Constants.JSON_PROGRESS, proker.getProgress());
+        json.addProperty(Constants.JSON_PARENT_DIVISI, proker.getParentDivisi());
         return json;
     }
 
@@ -167,13 +172,13 @@ public class DataStore {
         Division div = new Division(name);
 
         // Load members
-        if (json.has("members")) {
-            JsonArray membersArray = json.getAsJsonArray("members");
+        if (json.has(Constants.JSON_MEMBERS)) {
+            JsonArray membersArray = json.getAsJsonArray(Constants.JSON_MEMBERS);
             for (JsonElement elem : membersArray) {
                 JsonObject obj = elem.getAsJsonObject();
                 String type = obj.get("type").getAsString();
 
-                if (type.equals("Division")) {
+                if ("Division".equals(type)) {
                     // Rekursif untuk sub-divisi
                     div.addMember(jsonToDivision(obj));
                 } else {
@@ -184,8 +189,8 @@ public class DataStore {
         }
 
         // Load prokers
-        if (json.has("prokers")) {
-            JsonArray prokersArray = json.getAsJsonArray("prokers");
+        if (json.has(Constants.JSON_PROKERS)) {
+            JsonArray prokersArray = json.getAsJsonArray(Constants.JSON_PROKERS);
             for (JsonElement elem : prokersArray) {
                 div.addProker(jsonToProker(elem.getAsJsonObject()));
             }
@@ -198,27 +203,18 @@ public class DataStore {
     private static Member jsonToMember(JsonObject json) {
         String name = json.get("name").getAsString();
         String type = json.get("type").getAsString();
-        int uangKas = json.has("uangKas") ? json.get("uangKas").getAsInt() : 0;
-        String perpanjangan = json.has("perpanjangan") ? json.get("perpanjangan").getAsString() : "-";
+        int uangKas = json.has(Constants.JSON_UANG_KAS) ? json.get(Constants.JSON_UANG_KAS).getAsInt() : 0;
+        String perpanjangan = json.has(Constants.JSON_PERPANJANGAN) ? json.get(Constants.JSON_PERPANJANGAN).getAsString() : "-";
         String role = json.get("role").getAsString();
 
         // Buat member sesuai tipe
-        Member member;
-        String id = "ID-" + System.currentTimeMillis(); // Generate ID baru
-
-        switch (type) {
-            case "StaffMuda":
-                member = new StaffMuda(name, id);
-                break;
-            case "StaffAhli":
-                member = new StaffAhli(name, id);
-                break;
-            case "OfficeHolder":
-                member = new OfficeHolder(name, id, role);
-                break;
-            default:
-                member = new StaffMuda(name, id); // Fallback
-        }
+        String id = "ID-" + System.currentTimeMillis();
+        Member member = switch (type) {
+            case "StaffMuda" -> new StaffMuda(name, id);
+            case "StaffAhli" -> new StaffAhli(name, id);
+            case "OfficeHolder" -> new OfficeHolder(name, id, role);
+            default -> new StaffMuda(name, id);
+        };
 
         // Set data tambahan
         member.bayarKas(uangKas);
@@ -230,12 +226,12 @@ public class DataStore {
     // ==================== HELPER: JSON → PROKER ====================
     private static Proker jsonToProker(JsonObject json) {
         String namaProker = json.get("namaProker").getAsString();
-        String deskripsi = json.has("deskripsi") ? json.get("deskripsi").getAsString() : "-";
-        String ketupel = json.has("ketupel") ? json.get("ketupel").getAsString() : "-";
-        String waketupel = json.has("waketupel") ? json.get("waketupel").getAsString() : "-";
-        String status = json.has("status") ? json.get("status").getAsString() : "Rencana";
-        int progress = json.has("progress") ? json.get("progress").getAsInt() : 0;
-        String parentDivisi = json.has("parentDivisi") ? json.get("parentDivisi").getAsString() : "-";
+        String deskripsi = json.has(Constants.JSON_DESKRIPSI) ? json.get(Constants.JSON_DESKRIPSI).getAsString() : "-";
+        String ketupel = json.has(Constants.JSON_KETUPEL) ? json.get(Constants.JSON_KETUPEL).getAsString() : "-";
+        String waketupel = json.has(Constants.JSON_WAKETUPEL) ? json.get(Constants.JSON_WAKETUPEL).getAsString() : "-";
+        String status = json.has(Constants.JSON_STATUS) ? json.get(Constants.JSON_STATUS).getAsString() : Constants.STATUS_RENCANA;
+        int progress = json.has(Constants.JSON_PROGRESS) ? json.get(Constants.JSON_PROGRESS).getAsInt() : 0;
+        String parentDivisi = json.has(Constants.JSON_PARENT_DIVISI) ? json.get(Constants.JSON_PARENT_DIVISI).getAsString() : "-";
 
         return new Proker(namaProker, deskripsi, ketupel, waketupel, status, progress, parentDivisi);
     }

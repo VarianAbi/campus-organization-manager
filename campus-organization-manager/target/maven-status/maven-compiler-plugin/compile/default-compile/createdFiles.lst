@@ -14,6 +14,7 @@ com\campusorg\patterns\composite\StaffAhli.class
 com\campusorg\patterns\composite\Member.class
 com\campusorg\models\Proker.class
 com\campusorg\database\DataStore.class
+com\campusorg\utils\Constants.class
 com\campusorg\patterns\composite\OfficeHolder.class
 com\campusorg\patterns\composite\StaffMuda.class
 com\campusorg\gui\panels\ProkerPanel$2.class
