@@ -66,7 +66,7 @@ public class AllMembersPanel extends JPanel {
         searchField = new JTextField(15);
         searchField.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         List<String> divs = new ArrayList<>();
-        divs.add("Semua Divisi");
+        divs.add(Constants.FILTER_SEMUA_DIVISI);
         for (String s : OrgManager.getInstance().getDivisionNames())
             Collections.addAll(divs, s);
         filterCombo = new JComboBox<>(divs.toArray(new String[divs.size()]));
@@ -78,6 +78,12 @@ public class AllMembersPanel extends JPanel {
         btnFilter.setForeground(Color.black);
         btnFilter.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 12));
         btnFilter.addActionListener(e -> doFilter());
+        // Live filter saat mengetik
+        searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { doFilter(); }
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { doFilter(); }
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { doFilter(); }
+        });
 
         filterPnl.add(new JLabel("🔍 Cari:"));
         filterPnl.add(searchField);
@@ -161,9 +167,15 @@ public class AllMembersPanel extends JPanel {
         List<RowFilter<Object, Object>> filters = new ArrayList<>();
         if (!text.isEmpty())
             filters.add(RowFilter.regexFilter("(?i)" + text, 0));
-        if (!div.equals(Constants.STATUS_SEMUA))
+        if (!div.equals(Constants.FILTER_SEMUA_DIVISI))
             filters.add(RowFilter.regexFilter("(?i)" + div, 1));
-        sorter.setRowFilter(RowFilter.andFilter(filters));
+        if (filters.isEmpty()) {
+            sorter.setRowFilter(null);
+        } else if (filters.size() == 1) {
+            sorter.setRowFilter(filters.get(0));
+        } else {
+            sorter.setRowFilter(RowFilter.andFilter(filters));
+        }
     }
 
     // ==================== TAMBAH ANGGOTA DIALOG ====================

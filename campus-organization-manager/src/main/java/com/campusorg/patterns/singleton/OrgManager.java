@@ -9,8 +9,8 @@ import com.campusorg.patterns.composite.Member;
 import com.campusorg.patterns.composite.OrgComponent;
 import com.campusorg.patterns.observer.NewsPublisher;
 
+@SuppressWarnings({"java:S6548", "squid:S6548"})
 public class OrgManager {
-    private static OrgManager instance;
     
     private Division rootOrg; // HIMAKOM
     
@@ -36,10 +36,8 @@ public class OrgManager {
         }
     }
 
-    public static OrgManager getInstance() {
-        if (instance == null) instance = new OrgManager();
-        return instance;
-    }
+    private static class Holder { private static final OrgManager INSTANCE = new OrgManager(); }
+    public static OrgManager getInstance() { return Holder.INSTANCE; }
 
     private void initStructure() {
         rootOrg = new Division("HIMAKOM (Pusat)");
@@ -110,15 +108,12 @@ public class OrgManager {
      * Rebuild divisionMap dari struktur tree (untuk setelah load JSON)
      */
     private void rebuildDivisionMap(Division div) {
-        // Jangan tambahkan root "HIMAKOM (Pusat)" ke map
-        if (!div.getName().equals("HIMAKOM (Pusat)")) {
+        if (!"HIMAKOM (Pusat)".equals(div.getName())) {
             divisionMap.put(div.getName(), div);
         }
-        
-        // Rekursif ke semua child
         for (OrgComponent comp : div.getMembers()) {
-            if (comp instanceof Division) {
-                rebuildDivisionMap((Division) comp);
+            if (comp instanceof Division division) {
+                rebuildDivisionMap(division);
             }
         }
     }
@@ -128,10 +123,10 @@ public class OrgManager {
      */
     private void resubscribeAllMembers(Division div) {
         for (OrgComponent comp : div.getMembers()) {
-            if (comp instanceof Member) {
-                publisher.subscribe((Member) comp);
-            } else if (comp instanceof Division) {
-                resubscribeAllMembers((Division) comp); // Rekursif
+            switch (comp) {
+                case Member member -> publisher.subscribe(member);
+                case Division division -> resubscribeAllMembers(division);
+                default -> { /* ignore other component types */ }
             }
         }
     }

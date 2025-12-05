@@ -27,10 +27,14 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import com.campusorg.models.Proker;
 import com.campusorg.patterns.composite.Division;
@@ -46,6 +50,7 @@ public class ProkerPanel extends JPanel {
     // --- LIST VIEW COMPONENTS ---
     private JTable table;
     private DefaultTableModel model;
+    private transient TableRowSorter<DefaultTableModel> sorter;
     private JTextField searchField;
     private JComboBox<String> statusFilter;
 
@@ -115,13 +120,17 @@ public class ProkerPanel extends JPanel {
         statusFilter.setBackground(Color.WHITE);
         statusFilter.setForeground(new Color(41, 128, 185));
         statusFilter.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
-        statusFilter.addActionListener(e -> doFilter());
+        statusFilter.addActionListener(e -> applyFilters());
 
         // Search field
         searchField = new JTextField(12);
         searchField.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         searchField.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
-        searchField.addActionListener(e -> doFilter());
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) { applyFilters(); }
+            @Override public void removeUpdate(DocumentEvent e) { applyFilters(); }
+            @Override public void changedUpdate(DocumentEvent e) { applyFilters(); }
+        });
 
         // Panel Filter bergaya putih dengan border, seperti AllMembersPanel
         JPanel filterPnl = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
@@ -166,6 +175,9 @@ public class ProkerPanel extends JPanel {
         table.getTableHeader().setForeground(Color.BLACK);
         table.setSelectionBackground(new Color(255, 234, 167));
         table.setSelectionForeground(Color.BLACK);
+
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
 
         // HANYA lakukan ini, jangan yang lain!
         JScrollPane scrollPane = new JScrollPane(table);
@@ -358,23 +370,23 @@ public class ProkerPanel extends JPanel {
                 }
             }
         }
-        doFilter();
+        applyFilters();
     }
 
-    private void doFilter() {
-        String search = searchField.getText().trim().toLowerCase();
+    private void applyFilters() {
+        if (sorter == null) return;
+        String search = searchField.getText().trim();
         String status = (String) statusFilter.getSelectedItem();
-        for (int i = model.getRowCount() - 1; i >= 0; i--) {
-            String nama = ((String) model.getValueAt(i, 0)).toLowerCase();
-            String stat = ((String) model.getValueAt(i, 2));
-            boolean match = true;
-            if (!search.isEmpty() && !nama.contains(search))
-                match = false;
-            if (!"Semua Status".equals(status) && !stat.equals(status))
-                match = false;
-            if (!match)
-                model.removeRow(i);
-        }
+
+        RowFilter<DefaultTableModel, Object> rfSearch = search.isEmpty()
+                ? RowFilter.regexFilter(".*", 0)
+                : RowFilter.regexFilter("(?i)" + java.util.regex.Pattern.quote(search), 0);
+
+        RowFilter<DefaultTableModel, Object> rfStatus = Constants.STATUS_SEMUA.equals(status)
+                ? RowFilter.regexFilter(".*", 2)
+                : RowFilter.regexFilter("^" + java.util.regex.Pattern.quote(status) + "$", 2);
+
+        sorter.setRowFilter(RowFilter.andFilter(java.util.List.of(rfSearch, rfStatus)));
     }
 
     private void openSelectedProker() {

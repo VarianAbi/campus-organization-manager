@@ -14,13 +14,16 @@ com\campusorg\patterns\composite\StaffAhli.class
 com\campusorg\patterns\composite\Member.class
 com\campusorg\models\Proker.class
 com\campusorg\database\DataStore.class
+com\campusorg\gui\panels\AllMembersPanel$2.class
 com\campusorg\utils\Constants.class
 com\campusorg\patterns\composite\OfficeHolder.class
 com\campusorg\patterns\composite\StaffMuda.class
+com\campusorg\patterns\singleton\OrgManager$Holder.class
 com\campusorg\gui\panels\ProkerPanel$2.class
 com\campusorg\app\MainApp$1.class
 com\campusorg\gui\panels\HomePanel$2.class
 com\campusorg\gui\panels\AllMembersPanel$1.class
+com\campusorg\gui\panels\ProkerPanel$3.class
 com\campusorg\gui\panels\HomePanel.class
 com\campusorg\patterns\singleton\OrgManager.class
 com\campusorg\gui\panels\HomePanel$4.class

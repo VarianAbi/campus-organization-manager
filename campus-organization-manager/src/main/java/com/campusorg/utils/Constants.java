@@ -27,6 +27,9 @@ public final class Constants {
     public static final String STATUS_BERJALAN = "Berjalan";
     public static final String STATUS_SELESAI = "Selesai";
 
+    // Filters
+    public static final String FILTER_SEMUA_DIVISI = "Semua Divisi";
+
     // JSON keys
     public static final String JSON_MEMBERS = "members";
     public static final String JSON_PROKERS = "prokers";
