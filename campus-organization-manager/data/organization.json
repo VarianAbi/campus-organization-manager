@@ -14,7 +14,17 @@
           "type": "OfficeHolder"
         }
       ],
-      "prokers": []
+      "prokers": [
+        {
+          "namaProker": "KAPAN DIBAGI JAHIM",
+          "deskripsi": "",
+          "ketupel": "hideng",
+          "waketupel": "",
+          "status": "Rencana",
+          "progress": 0,
+          "parentDivisi": "BPH Inti"
+        }
+      ]
     },
     {
       "name": "Biro KESRA",
@@ -39,13 +49,39 @@
     {
       "name": "Dept. SENOR",
       "type": "Division",
-      "members": [],
-      "prokers": []
+      "members": [
+        {
+          "name": "nabastala",
+          "role": "Staff Muda",
+          "uangKas": 0,
+          "perpanjangan": "-",
+          "type": "StaffMuda"
+        }
+      ],
+      "prokers": [
+        {
+          "namaProker": "HCW",
+          "deskripsi": "",
+          "ketupel": "sinang",
+          "waketupel": "sare",
+          "status": "Berjalan",
+          "progress": 0,
+          "parentDivisi": "Dept. SENOR"
+        }
+      ]
     },
     {
       "name": "Dept. ILPROF",
       "type": "Division",
-      "members": [],
+      "members": [
+        {
+          "name": "verse",
+          "role": "Ketua Departemen",
+          "uangKas": 0,
+          "perpanjangan": "-",
+          "type": "OfficeHolder"
+        }
+      ],
       "prokers": []
     },
     {
@@ -63,8 +99,26 @@
     {
       "name": "Dept. PSDA",
       "type": "Division",
-      "members": [],
-      "prokers": []
+      "members": [
+        {
+          "name": "bacang",
+          "role": "Staff Ahli",
+          "uangKas": 0,
+          "perpanjangan": "-",
+          "type": "StaffAhli"
+        }
+      ],
+      "prokers": [
+        {
+          "namaProker": "LKMM",
+          "deskripsi": "",
+          "ketupel": "Him Dinan",
+          "waketupel": "Onenk",
+          "status": "Selesai",
+          "progress": 0,
+          "parentDivisi": "Dept. PSDA"
+        }
+      ]
     },
     {
       "name": "Unit TEKNO",

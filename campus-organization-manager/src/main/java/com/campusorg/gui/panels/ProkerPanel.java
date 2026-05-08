@@ -27,14 +27,19 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import com.campusorg.models.Proker;
 import com.campusorg.patterns.composite.Division;
 import com.campusorg.patterns.singleton.OrgManager;
+import com.campusorg.utils.Constants;
 
 public class ProkerPanel extends JPanel {
 
@@ -45,6 +50,7 @@ public class ProkerPanel extends JPanel {
     // --- LIST VIEW COMPONENTS ---
     private JTable table;
     private DefaultTableModel model;
+    private transient TableRowSorter<DefaultTableModel> sorter;
     private JTextField searchField;
     private JComboBox<String> statusFilter;
 
@@ -97,30 +103,46 @@ public class ProkerPanel extends JPanel {
         JButton btnAddProker = new JButton("➕ Tambah Proker");
         btnAddProker.setBackground(new Color(46, 204, 113));
         btnAddProker.setForeground(Color.BLACK);
-        btnAddProker.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnAddProker.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnAddProker.setFocusPainted(false);
         btnAddProker.addActionListener(e -> showInputProkerDialog());
 
         JButton btnDeleteProker = new JButton("🗑️ Hapus Proker");
         btnDeleteProker.setBackground(new Color(231, 76, 60));
         btnDeleteProker.setForeground(Color.black);
-        btnDeleteProker.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnDeleteProker.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnDeleteProker.setFocusPainted(false);
         btnDeleteProker.addActionListener(e -> deleteSelectedProker());
 
         // Filter status
-        statusFilter = new JComboBox<>(new String[] { "Semua Status", "Rencana", "Berjalan", "Selesai" });
+        statusFilter = new JComboBox<>(new String[] { Constants.STATUS_SEMUA, Constants.STATUS_RENCANA,
+                Constants.STATUS_BERJALAN, Constants.STATUS_SELESAI });
         statusFilter.setSelectedIndex(0);
         statusFilter.setBackground(Color.WHITE);
         statusFilter.setForeground(new Color(41, 128, 185));
-        statusFilter.setFont(new Font("Poppins", Font.BOLD, 13));
-        statusFilter.addActionListener(e -> doFilter());
+        statusFilter.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
+        statusFilter.addActionListener(e -> applyFilters());
 
         // Search field
         searchField = new JTextField(12);
-        searchField.setFont(new Font("Poppins", Font.PLAIN, 13));
+        searchField.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
         searchField.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
-        searchField.addActionListener(e -> doFilter());
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                applyFilters();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                applyFilters();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                applyFilters();
+            }
+        });
 
         // Panel Filter bergaya putih dengan border, seperti AllMembersPanel
         JPanel filterPnl = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
@@ -158,13 +180,16 @@ public class ProkerPanel extends JPanel {
         };
         table = new JTable(model);
         table.setRowHeight(28);
-        table.setFont(new Font("Poppins", Font.PLAIN, 14));
+        table.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font(FONT_INRIA_SANS, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(52, 73, 94));
         table.getTableHeader().setBackground(new Color(52, 73, 94));
         table.getTableHeader().setForeground(Color.BLACK);
         table.setSelectionBackground(new Color(255, 234, 167));
         table.setSelectionForeground(Color.BLACK);
+
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
 
         // HANYA lakukan ini, jangan yang lain!
         JScrollPane scrollPane = new JScrollPane(table);
@@ -184,7 +209,7 @@ public class ProkerPanel extends JPanel {
 
         JLabel hint = new JLabel("ℹ️ Klik 2x pada baris untuk melihat detail & ubah status.");
         hint.setForeground(new Color(41, 128, 185));
-        hint.setFont(new Font("Poppins", Font.ITALIC, 12));
+        hint.setFont(new Font(Constants.FONT_POPPINS, Font.ITALIC, 12));
         panel.add(hint, BorderLayout.SOUTH);
 
         return panel;
@@ -203,7 +228,7 @@ public class ProkerPanel extends JPanel {
         JButton btnBack = new JButton("⬅ Kembali ke List");
         btnBack.setBackground(Color.WHITE);
         btnBack.setForeground(new Color(41, 128, 185));
-        btnBack.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnBack.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnBack.setFocusPainted(false);
         btnBack.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
         btnBack.addActionListener(e -> showList());
@@ -213,14 +238,14 @@ public class ProkerPanel extends JPanel {
         JButton btnEdit = new JButton("✏️ Edit");
         btnEdit.setBackground(new Color(255, 234, 167)); // Kuning terang
         btnEdit.setForeground(new Color(41, 128, 185));
-        btnEdit.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnEdit.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnEdit.setFocusPainted(false);
         btnEdit.setBorder(BorderFactory.createLineBorder(new Color(241, 196, 15), 2));
         btnEdit.addActionListener(e -> editCurrentProker());
         JButton btnDelete = new JButton("🗑️ Hapus");
         btnDelete.setBackground(new Color(231, 76, 60));
         btnDelete.setForeground(Color.black);
-        btnDelete.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnDelete.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnDelete.setFocusPainted(false);
         btnDelete.setBorder(BorderFactory.createLineBorder(new Color(192, 57, 43), 2));
         btnDelete.addActionListener(e -> deleteCurrentProker());
@@ -245,7 +270,7 @@ public class ProkerPanel extends JPanel {
         lblName.setForeground(new Color(41, 128, 185));
 
         lblStatus = new JLabel("Status: -");
-        lblStatus.setFont(new Font("Poppins", Font.BOLD, 15));
+        lblStatus.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 15));
         lblStatus.setOpaque(true);
         lblStatus.setBorder(new EmptyBorder(5, 10, 5, 10));
 
@@ -263,11 +288,11 @@ public class ProkerPanel extends JPanel {
         txtDesc.setEditable(false);
         txtDesc.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185)),
                 "Divisi/Seksi Internal Proker"));
-        txtDesc.setFont(new Font("Poppins", Font.PLAIN, 13));
+        txtDesc.setFont(new Font(Constants.FONT_POPPINS, Font.PLAIN, 13));
 
         // Lampiran (dummy)
         lblLampiran = new JLabel("Lampiran: - (belum ada)");
-        lblLampiran.setFont(new Font("Poppins", Font.ITALIC, 12));
+        lblLampiran.setFont(new Font(Constants.FONT_POPPINS, Font.ITALIC, 12));
         lblLampiran.setForeground(new Color(127, 140, 141));
 
         // Catatan (dummy)
@@ -285,7 +310,7 @@ public class ProkerPanel extends JPanel {
         JButton btnUpdate = new JButton("Ubah Status (Cycle)");
         btnUpdate.setBackground(new Color(41, 128, 185));
         btnUpdate.setForeground(Color.WHITE);
-        btnUpdate.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnUpdate.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnUpdate.setFocusPainted(false);
         btnUpdate.setBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2));
         btnUpdate.addActionListener(e -> actionUpdateStatus());
@@ -357,23 +382,24 @@ public class ProkerPanel extends JPanel {
                 }
             }
         }
-        doFilter();
+        applyFilters();
     }
 
-    private void doFilter() {
-        String search = searchField.getText().trim().toLowerCase();
+    private void applyFilters() {
+        if (sorter == null)
+            return;
+        String search = searchField.getText().trim();
         String status = (String) statusFilter.getSelectedItem();
-        for (int i = model.getRowCount() - 1; i >= 0; i--) {
-            String nama = ((String) model.getValueAt(i, 0)).toLowerCase();
-            String stat = ((String) model.getValueAt(i, 2));
-            boolean match = true;
-            if (!search.isEmpty() && !nama.contains(search))
-                match = false;
-            if (!"Semua Status".equals(status) && !stat.equals(status))
-                match = false;
-            if (!match)
-                model.removeRow(i);
-        }
+
+        RowFilter<DefaultTableModel, Object> rfSearch = search.isEmpty()
+                ? RowFilter.regexFilter(".*", 0)
+                : RowFilter.regexFilter("(?i)" + java.util.regex.Pattern.quote(search), 0);
+
+        RowFilter<DefaultTableModel, Object> rfStatus = Constants.STATUS_SEMUA.equals(status)
+                ? RowFilter.regexFilter(".*", 2)
+                : RowFilter.regexFilter("^" + java.util.regex.Pattern.quote(status) + "$", 2);
+
+        sorter.setRowFilter(RowFilter.andFilter(java.util.List.of(rfSearch, rfStatus)));
     }
 
     private void openSelectedProker() {
@@ -421,11 +447,11 @@ public class ProkerPanel extends JPanel {
     private void updateStatusLabel(String status) {
         lblStatus.setText("Status: " + status);
         switch (status) {
-            case "Selesai" -> {
+            case Constants.STATUS_SELESAI -> {
                 lblStatus.setBackground(new Color(46, 204, 113));
                 lblStatus.setForeground(Color.WHITE);
             }
-            case "Berjalan" -> {
+            case Constants.STATUS_BERJALAN -> {
                 lblStatus.setBackground(new Color(52, 152, 219));
                 lblStatus.setForeground(Color.WHITE);
             }
@@ -442,16 +468,16 @@ public class ProkerPanel extends JPanel {
 
         String s = currentProker.getStatus();
         switch (s) {
-            case "Rencana" -> currentProker.setStatus("Berjalan");
-            case "Berjalan" -> currentProker.setStatus("Selesai");
-            default -> currentProker.setStatus("Rencana");
+            case Constants.STATUS_RENCANA -> currentProker.setStatus(Constants.STATUS_BERJALAN);
+            case Constants.STATUS_BERJALAN -> currentProker.setStatus(Constants.STATUS_SELESAI);
+            default -> currentProker.setStatus(Constants.STATUS_RENCANA);
         }
 
         updateStatusLabel(currentProker.getStatus());
         JOptionPane.showMessageDialog(this, "Status diubah menjadi: " + currentProker.getStatus());
         switch (currentProker.getStatus()) {
-            case "Rencana" -> currentProker.setProgress(0);
-            case "Berjalan" -> currentProker.setProgress(50);
+            case Constants.STATUS_RENCANA -> currentProker.setProgress(0);
+            case Constants.STATUS_BERJALAN -> currentProker.setProgress(50);
             default -> currentProker.setProgress(100);
         }
         progressBar.setValue(currentProker.getProgress());
@@ -482,7 +508,7 @@ public class ProkerPanel extends JPanel {
         JButton btnSave = new JButton("SIMPAN");
         btnSave.setBackground(new Color(46, 204, 113));
         btnSave.setForeground(Color.WHITE);
-        btnSave.setFont(new Font("Poppins", Font.BOLD, 12));
+        btnSave.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 12));
 
         btnSave.addActionListener(e -> {
             String nama = inpNama.getText().trim();
@@ -494,7 +520,7 @@ public class ProkerPanel extends JPanel {
                 JOptionPane.showMessageDialog(dialog, "Nama Proker & Ketuplak wajib diisi!");
                 return;
             }
-            Proker p = new Proker(nama, desc, ketupel, waketupel, "Rencana", 0, div);
+            Proker p = new Proker(nama, desc, ketupel, waketupel, Constants.STATUS_RENCANA, 0, div);
             OrgManager.getInstance().getDivisionByName(div).addProker(p);
             JOptionPane.showMessageDialog(dialog, "Berhasil Input Proker: " + nama);
             dialog.dispose();
@@ -612,7 +638,7 @@ public class ProkerPanel extends JPanel {
         JButton btnSave = new JButton("💾 Simpan Perubahan");
         btnSave.setBackground(new Color(46, 204, 113));
         btnSave.setForeground(Color.WHITE);
-        btnSave.setFont(new Font("Poppins", Font.BOLD, 13));
+        btnSave.setFont(new Font(Constants.FONT_POPPINS, Font.BOLD, 13));
         btnSave.setFocusPainted(false);
 
         btnSave.addActionListener(e -> {
