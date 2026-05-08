@@ -54,7 +54,7 @@ public class AllMembersPanel extends JPanel {
         JPanel topContainer = new JPanel(new BorderLayout(10, 10));
         topContainer.setOpaque(false);
 
-        JLabel title = new JLabel("Data Seluruh Anggota HIMAKOM");
+        JLabel title = new JLabel("👥 Data Seluruh Anggota HIMAKOM");
         title.setFont(new Font("Inria Sans", Font.BOLD, 22));
 
         // Panel Filter
@@ -165,7 +165,7 @@ public class AllMembersPanel extends JPanel {
         sorter.setRowFilter(RowFilter.andFilter(filters));
     }
 
-    // ==================== TAMBAH ANGGOTA DIALOG ====================
+    // ==================== TAMBA   H ANGGOTA DIALOG ====================
     private void showInputMemberDialog() {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Input Anggota Baru", true);
         dialog.setSize(400, 350);
@@ -237,7 +237,8 @@ public class AllMembersPanel extends JPanel {
     private void deleteSelectedMember() {
         int row = table.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih anggota yang ingin dihapus!", "Info", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Pilih anggota yang ingin dihapus!", "Info",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -249,10 +250,10 @@ public class AllMembersPanel extends JPanel {
 
         // Konfirmasi hapus
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Apakah Anda yakin ingin menghapus anggota:\n" + name + "\nDivisi: " + divisi + "\nJabatan: " + jabatan,
-            "Konfirmasi Hapus",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
+                "Apakah Anda yakin ingin menghapus anggota:\n" + name + "\nDivisi: " + divisi + "\nJabatan: " + jabatan,
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             Division div = OrgManager.getInstance().getDivisionByName(divisi);
@@ -260,7 +261,8 @@ public class AllMembersPanel extends JPanel {
                 Member target = findMemberInDivision(div, name);
                 if (target != null) {
                     div.removeMember(target);
-                    JOptionPane.showMessageDialog(this, "Anggota berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Anggota berhasil dihapus!", "Sukses",
+                            JOptionPane.INFORMATION_MESSAGE);
                     refreshData(); // Refresh tabel
                 } else {
                     JOptionPane.showMessageDialog(this, "Anggota tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -279,7 +281,8 @@ public class AllMembersPanel extends JPanel {
             } else if (comp instanceof Division subDiv) {
                 // Rekursif untuk sub-divisi
                 Member found = findMemberInDivision(subDiv, targetName);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
         }
         return null;

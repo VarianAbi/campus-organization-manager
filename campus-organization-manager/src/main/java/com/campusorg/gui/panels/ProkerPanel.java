@@ -521,7 +521,8 @@ public class ProkerPanel extends JPanel {
     private void deleteSelectedProker() {
         int row = table.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih program kerja yang ingin dihapus!", "Info", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Pilih program kerja yang ingin dihapus!", "Info",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -532,10 +533,10 @@ public class ProkerPanel extends JPanel {
 
         // Konfirmasi hapus
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Apakah Anda yakin ingin menghapus program kerja:\n\"" + prokerName + "\"\nDari divisi: " + divisi,
-            "Konfirmasi Hapus",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
+                "Apakah Anda yakin ingin menghapus program kerja:\n\"" + prokerName + "\"\nDari divisi: " + divisi,
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             Division div = OrgManager.getInstance().getDivisionByName(divisi);
@@ -550,10 +551,12 @@ public class ProkerPanel extends JPanel {
 
                 if (target != null) {
                     div.getProkerList().remove(target);
-                    JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses",
+                            JOptionPane.INFORMATION_MESSAGE);
                     refreshData(); // Refresh tabel
                 } else {
-                    JOptionPane.showMessageDialog(this, "Program kerja tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Program kerja tidak ditemukan!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -561,21 +564,23 @@ public class ProkerPanel extends JPanel {
 
     // --- FITUR HAPUS PROKER DARI DETAIL VIEW ---
     private void deleteCurrentProker() {
-        if (currentProker == null) return;
+        if (currentProker == null)
+            return;
 
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Apakah Anda yakin ingin menghapus program kerja:\n\"" + currentProker.getNamaProker() + "\"?",
-            "Konfirmasi Hapus",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
+                "Apakah Anda yakin ingin menghapus program kerja:\n\"" + currentProker.getNamaProker() + "\"?",
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             String divisiName = currentProker.getParentDivisi();
             Division div = OrgManager.getInstance().getDivisionByName(divisiName);
-            
+
             if (div != null) {
                 div.getProkerList().remove(currentProker);
-                JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Program kerja berhasil dihapus!", "Sukses",
+                        JOptionPane.INFORMATION_MESSAGE);
                 showList(); // Kembali ke list view
                 refreshData();
             }
@@ -584,7 +589,8 @@ public class ProkerPanel extends JPanel {
 
     // --- FITUR EDIT PROKER DARI DETAIL VIEW ---
     private void editCurrentProker() {
-        if (currentProker == null) return;
+        if (currentProker == null)
+            return;
 
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit Program Kerja", true);
         dialog.setSize(450, 550);
@@ -595,7 +601,7 @@ public class ProkerPanel extends JPanel {
         formPanel.setBackground(Color.WHITE);
 
         JTextField inpNama = new JTextField(currentProker.getNamaProker());
-        JComboBox<String> inpStatus = new JComboBox<>(new String[]{"Rencana", "Berjalan", "Selesai"});
+        JComboBox<String> inpStatus = new JComboBox<>(new String[] { "Rencana", "Berjalan", "Selesai" });
         inpStatus.setSelectedItem(currentProker.getStatus());
         JTextField inpKetupel = new JTextField(currentProker.getKetupel());
         JTextField inpWaketupel = new JTextField(currentProker.getWaketupel());
@@ -640,14 +646,10 @@ public class ProkerPanel extends JPanel {
 
     // Init Component (Kosong, dipanggil di Constructor)
     private void initListView() {
-        // Method intentionally left empty because list view initialization is handled
-        // in createListViewPanel().
-        // If implementation is needed in the future, remove the exception below.
+        // No-op: list view already built in createListViewPanel().
     }
 
     private void initDetailView() {
-        // Method intentionally left empty because detail view initialization is handled
-        // in createDetailViewPanel().
-        // If implementation is needed in the future, remove the exception below.
+        // No-op: detail view already built in createDetailViewPanel().
     }
 }
